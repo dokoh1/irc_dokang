@@ -27,13 +27,11 @@ class IRCServer
 		void connection_handling(); //새 클라이언트 연결을 처리
 		void message_handling(int client_fd); // 클라이언트로부터의 메시지를 처리
 		void client_remove(int client_fd); // 클라이언트를 제거
-
 		int listen_fd; // listen 소켓 파일 디스크립터
 		std::string server_pwd; // 서버 연결 비밀번호
 		std::vector<struct pollfd> poll_fd; // 폴링할 파일 디스크립터 목록 
 		//struct pollfd는 구조체는 readme에 설명이 있음
 		std::map<int, std::string> client_buffers; // 클라이언트 별로 수신된 데이터 버퍼를 저장
 };
-
 
 #endif
