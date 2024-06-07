@@ -76,15 +76,17 @@ void IRCServer::non_blocking(int cfd)
 
 void IRCServer::run()
 {
+	std::cout << "start run\n";
 	while (true) // 서버가 종료될 때까지 실행
 	{
+		std::cout << "poll waiting...";
 		int count_poll = poll(&poll_fd[0], poll_fd.size(), -1); //폴링, 이벤트가 발생할 떄까지 대기
 		if (count_poll == -1)
 		{
 			std::cerr << "poll error" << std::endl;
 			exit(1);
 		}
-		
+		std::cout << "running...\n";
 		for (size_t i = 0; i < poll_fd.size(); i++) // 모든 파일 디스크립터를 순회
 		{
 			if (poll_fd[i].revents & POLLIN) // 읽기 가능한 이벤트가 발생했는지 확인
@@ -99,6 +101,7 @@ void IRCServer::run()
 
 			} 
 		}
+		std::cout << "complete\n";
 	}
 }
 

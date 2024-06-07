@@ -82,7 +82,7 @@ poll 이란?
 이는 서버가 여러 클라이언트와 동시에 통신할 수 있게 해주기 때문에 매우 유용합니다.
 
 - 'poll' 의 동작 방식
-* 'poll' 시스템 호출은 'strcut pollfd' 배열을 사용합니다.
+* 'poll' 시스템 호출은 'struct pollfd' 배열을 사용합니다.
 
 struct pollfd{
 	int fd; 		// 파일 디스크립터
