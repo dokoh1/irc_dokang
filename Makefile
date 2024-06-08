@@ -1,6 +1,6 @@
 NAME = Ircserv
 CPPFLAGS = -Werror -Wall -Wextra -std=c++98
-SRC = main.cpp FDMatcher.cpp IRCServer.cpp
+SRC = main.cpp FDMatcher.cpp IRCServer.cpp ServerMessage.cpp
 OBJ = $(SRC:.cpp=.o)
 
 all : $(NAME)

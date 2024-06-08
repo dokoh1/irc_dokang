@@ -13,7 +13,7 @@ IRCServer::IRCServer(const char *port, const char* password) : server_pwd(passwo
 	poll_fd.push_back(pfd); // listen 소켓을 폴링할 파일 디스크립터 목록에 추가합니다.
 }
 
-IRCServer::~IRCServer()
+IRCServer::~IRCServer() throw()
 {
 	close(listen_fd); // listen 소켓을 닫습니다.
 	for (size_t i = 1; i < poll_fd.size(); ++i)  // i = 0 은 listen 소켓이다.
@@ -76,17 +76,17 @@ void IRCServer::non_blocking(int cfd)
 
 void IRCServer::run()
 {
-	std::cout << "start run\n";
+	// std::cout << "start run\n";
 	while (true) // 서버가 종료될 때까지 실행
 	{
-		std::cout << "poll waiting...";
+		// std::cout << "poll waiting...";
 		int count_poll = poll(&poll_fd[0], poll_fd.size(), -1); //폴링, 이벤트가 발생할 떄까지 대기
 		if (count_poll == -1)
 		{
 			std::cerr << "poll error" << std::endl;
 			exit(1);
 		}
-		std::cout << "running...\n";
+		// std::cout << "running...\n";
 		for (size_t i = 0; i < poll_fd.size(); i++) // 모든 파일 디스크립터를 순회
 		{
 			if (poll_fd[i].revents & POLLIN) // 읽기 가능한 이벤트가 발생했는지 확인
@@ -101,7 +101,7 @@ void IRCServer::run()
 
 			} 
 		}
-		std::cout << "complete\n";
+		// std::cout << "complete\n";
 	}
 }
 
@@ -146,17 +146,18 @@ void IRCServer::message_handling(int client_fd)
 		client_remove(client_fd);
 		return ;
 	}
+
 	client_buffers[client_fd] += std::string(buffer, nread); // 읽은 데이터를 버퍼에 추가
 	size_t pos;
 	while (1)
 	{
-		
 		pos = client_buffers[client_fd].find("\n"); // 버퍼에서 줄바꿈 문자를 찾음
 		if (pos == std::string::npos)
 			break;
 		std::string message = client_buffers[client_fd].substr(0, pos); //메시지 추출
 		client_buffers[client_fd].erase(0, pos + 1); // 추출한 메시지를 버퍼에서 제거
-		std::cout << "Received message: " << message << std::endl; // 메시지를 출력
+		// std::cout << "Received message: " << message << std::endl; // 메시지를 출력
+		checkMessage(client_fd, message);
 	}
 }
 

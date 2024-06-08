@@ -13,13 +13,15 @@
 #include <unistd.h> // 유닉스 표준 함수 정의를 포함
 #include <poll.h> // I/O 다중화를 위해 "poll"함수를 사용하기 위해 포함
 
+#include <exception>
+
 #define BUFFER_SIZE 512 // 버퍼 크기를 512 바이트로 정의
 
-class IRCServer
+class IRCServer : public std::exception
 {
 	public:
 		IRCServer(const char* port, const char* password); //서버 초기화(생성자)
-		~IRCServer(); //소멸자
+		virtual ~IRCServer() throw(); //소멸자
 		void run(); //서버의 메인 루프를 실행
 	private:
 		int create_bind(const char* port); // 소캣을 생성 및 포트에 바인딩
@@ -32,6 +34,23 @@ class IRCServer
 		std::vector<struct pollfd> poll_fd; // 폴링할 파일 디스크립터 목록 
 		//struct pollfd는 구조체는 readme에 설명이 있음
 		std::map<int, std::string> client_buffers; // 클라이언트 별로 수신된 데이터 버퍼를 저장
+
+
+		// in ServerMessage.cpp
+		void send_message(int client_fd, std::string message);
+		void requestForJoin(int client_fd);
+		void checkMessage(int client_fd, std::string message);
+
+
+		// exception
+		class sendMessageException
+		{
+		public:
+			virtual const char * what() const throw()
+			{
+				return "[Exception] Error : Message sending failed";
+			}
+		};
 };
 
 #endif
