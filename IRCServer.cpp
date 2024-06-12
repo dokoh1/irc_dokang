@@ -1,8 +1,11 @@
 #include "IRCServer.hpp"
 #include "FDMatcher.hpp"
 
-IRCServer::IRCServer(const char *port, const char* password) : server_pwd(password)
+IRCServer::IRCServer(const char *port, const char* password)
 {
+	this->serverinfo.serverName = "dokang";
+	this->serverinfo.server_pwd = password;
+
 	this -> listen_fd = create_bind(port); // 주어진 포트에 바인딩된 소켓을 생성
 	non_blocking(this -> listen_fd); // 소켓을 논블로킹 모드로 설정
 	listen(this -> listen_fd, SOMAXCONN); // 소켓을 수신 대기 상태로 설정
@@ -151,13 +154,16 @@ void IRCServer::message_handling(int client_fd)
 	size_t pos;
 	while (1)
 	{
+
 		pos = client_buffers[client_fd].find("\n"); // 버퍼에서 줄바꿈 문자를 찾음
 		if (pos == std::string::npos)
 			break;
 		std::string message = client_buffers[client_fd].substr(0, pos); //메시지 추출
 		client_buffers[client_fd].erase(0, pos + 1); // 추출한 메시지를 버퍼에서 제거
 		// std::cout << "Received message: " << message << std::endl; // 메시지를 출력
-		checkMessage(client_fd, message);
+		this->IRCMessageParse(message);
+		Response::checkMessage(client_fd, parsedMessage, serverinfo);
+		memset(&parsedMessage, 0, sizeof(IRCMessage));
 	}
 }
 
@@ -167,4 +173,15 @@ void IRCServer::client_remove(int client_fd)
 	poll_fd.erase(std::remove_if(poll_fd.begin(), poll_fd.end(), FDMatcher(client_fd)), poll_fd.end());
 	// 벡터에서 FDMatcher 함수 객체를 사용하여 클라이언트 파일 디스크립터와 일치하는 요소를 찾아 제거합니다.
 	client_buffers.erase(client_fd); // 맵에서 클라이언트 제거
+}
+
+User *IRCServer::findUser(std::string nick)
+{
+	std::vector<User *>::iterator it;
+	for (it = serverinfo.usersInServer.begin(); it != serverinfo.usersInServer.end(); ++it)
+	{
+		if ((*it)->nick == nick)
+			return (*it);
+	}
+	return (*it);
 }

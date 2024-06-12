@@ -4,6 +4,7 @@
 #include <iostream>  // 입출력 스트림
 #include <cstring>  // C 스타일 문자열 처리
 #include <vector> // 동적 배열을 사용하기 위해 포함
+#include <list>
 #include <map> // 키-값 쌍을 저장할 수 있는 맵 컨테이너 사용
 #include <algorithm> // 표준 알고리즘 함수를 사용하기 위해 포함
 #include <sys/types.h> // 시스템 타입 정의를 포함
@@ -14,8 +15,51 @@
 #include <poll.h> // I/O 다중화를 위해 "poll"함수를 사용하기 위해 포함
 
 #include <exception>
+#include <sstream>
+
+#include "Messages/Response.hpp"
 
 #define BUFFER_SIZE 512 // 버퍼 크기를 512 바이트로 정의
+
+struct User
+{
+	int client_fd;
+	std::string nick;
+	
+	std::string username;
+	std::string hostname;
+	std::string servername;
+	std::string realname;
+
+	std::map<int, std::string> client_buffers;
+};
+
+struct Channel
+{
+	std::string name;
+	std::string topic;
+	std::string key;
+	std::string operator_user;
+	int user_limit;
+} ;
+
+struct IRCMessage
+{
+	std::string prefix;
+	std::string command;
+	std::vector<std::string> params;
+	int numParams;
+};
+
+struct serverInfo
+{
+	std::string serverName;
+	std::string server_pwd; // 서버 연결 비밀번호
+
+	std::vector<User *> usersInServer; // 서버에 등록된 유저
+	std::vector<Channel *> channelInServer; // 서버에 존재하는 채널
+
+};
 
 class IRCServer : public std::exception
 {
@@ -24,6 +68,8 @@ class IRCServer : public std::exception
 		virtual ~IRCServer() throw(); //소멸자
 		void run(); //서버의 메인 루프를 실행
 	private:
+		serverInfo serverinfo;
+		std::string serverName;
 		int create_bind(const char* port); // 소캣을 생성 및 포트에 바인딩
 		void non_blocking(int cfd); // 소켓을 논블로킹 모드로 설정
 		void connection_handling(); //새 클라이언트 연결을 처리
@@ -32,25 +78,20 @@ class IRCServer : public std::exception
 		int listen_fd; // listen 소켓 파일 디스크립터
 		std::string server_pwd; // 서버 연결 비밀번호
 		std::vector<struct pollfd> poll_fd; // 폴링할 파일 디스크립터 목록 
+
+		// std::vector<User *> usersInServer; // 서버에 등록된 유저
+		// std::vector<Channel *> channelInServer; // 서버에 존재하는 채널
+
 		//struct pollfd는 구조체는 readme에 설명이 있음
 		std::map<int, std::string> client_buffers; // 클라이언트 별로 수신된 데이터 버퍼를 저장
+		bool AuthenticationFailed;
 
+		// in IRCMessageParse.cpp
+		void IRCMessageParse(std::string message);
+		IRCMessage parsedMessage;
 
-		// in ServerMessage.cpp
-		void send_message(int client_fd, std::string message);
-		void requestForJoin(int client_fd);
-		void checkMessage(int client_fd, std::string message);
+		User* findUser(std::string nick);
 
-
-		// exception
-		class sendMessageException
-		{
-		public:
-			virtual const char * what() const throw()
-			{
-				return "[Exception] Error : Message sending failed";
-			}
-		};
 };
 
 #endif

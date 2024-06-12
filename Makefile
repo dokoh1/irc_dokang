@@ -1,7 +1,10 @@
 NAME = Ircserv
-CPPFLAGS = -Werror -Wall -Wextra -std=c++98
-SRC = main.cpp FDMatcher.cpp IRCServer.cpp ServerMessage.cpp
-OBJ = $(SRC:.cpp=.o)
+CPPFLAGS = -Werror -Wall -Wextra -std=c++98 -g
+SRC = main.cpp FDMatcher.cpp IRCServer.cpp 
+SRCMSG = Messages/ServerMessage.cpp Messages/validationCheck.cpp Messages/Response.cpp
+SRCPRS = Parsing/IRCMessageParse.cpp
+
+OBJ = $(SRC:.cpp=.o) $(SRCMSG:.cpp=.o) $(SRCPRS:.cpp=.o)
 
 all : $(NAME)
 $(NAME) : $(OBJ)
