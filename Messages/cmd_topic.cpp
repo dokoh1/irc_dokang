@@ -1,25 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   validationCheck.hpp                                :+:      :+:    :+:   */
+/*   cmd_topic.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/12 14:16:44 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/12 16:06:32 by sihkang          ###   ########seoul.kr  */
+/*   Created: 2024/06/13 16:03:41 by sihkang           #+#    #+#             */
+/*   Updated: 2024/06/13 17:19:08 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef VALIDATIONCHECK_HPP
-# define VALIDATIONCHECK_HPP
+#include "Response.hpp"
 
-#include "../IRCServer.hpp"
-
-struct IRCMessage;
-struct serverInfo;
-
-bool isCommand(IRCMessage msg, std::string cmd);
-bool isCorrectPassword(serverInfo &info, std::string &client_pw);
-User *findUser(serverInfo info, std::string nick);
-
-#endif
+void Response::TOPIC(int client_fd, IRCMessage message, serverInfo &info)
+{
+	std::string chName = message.params[0];
+	std::string chTopic = aftercolonConcat(message);
+	findChannel(info, chName)->topic = chTopic;
+	Response::userPrefix(info);
+	send_message(client_fd, " TOPIC #" + chName + " :" + chTopic);
+	send_message(client_fd, "\r\n");
+}

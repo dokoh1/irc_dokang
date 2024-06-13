@@ -20,6 +20,19 @@
 #include "Messages/Response.hpp"
 
 #define BUFFER_SIZE 512 // 버퍼 크기를 512 바이트로 정의
+struct User;
+
+struct Channel
+{
+	std::string name;
+	std::string topic;
+	std::string key;
+	User *operator_user;
+	int user_limit;
+	// 채널모드 변수 필요
+
+	std::list<struct User *> channelUser;
+} ;
 
 struct User
 {
@@ -34,15 +47,6 @@ struct User
 	std::map<int, std::string> client_buffers;
 };
 
-struct Channel
-{
-	std::string name;
-	std::string topic;
-	std::string key;
-	std::string operator_user;
-	int user_limit;
-} ;
-
 struct IRCMessage
 {
 	std::string prefix;
@@ -56,8 +60,8 @@ struct serverInfo
 	std::string serverName;
 	std::string server_pwd; // 서버 연결 비밀번호
 
-	std::vector<User *> usersInServer; // 서버에 등록된 유저
-	std::vector<Channel *> channelInServer; // 서버에 존재하는 채널
+	std::list<User *> usersInServer; // 서버에 등록된 유저
+	std::list<Channel *> channelInServer; // 서버에 존재하는 채널
 
 };
 
@@ -89,9 +93,6 @@ class IRCServer : public std::exception
 		// in IRCMessageParse.cpp
 		void IRCMessageParse(std::string message);
 		IRCMessage parsedMessage;
-
-		User* findUser(std::string nick);
-
 };
 
 #endif

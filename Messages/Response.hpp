@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/12 15:20:03 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/13 17:12:33 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #include <fcntl.h> // 파일 제어 옵션을 설정하기 위해 포함
 #include <unistd.h> // 유닉스 표준 함수 정의를 포함
 #include "../IRCServer.hpp"
-#include "validationCheck.hpp"
+#include "tools.hpp"
 
 struct User;
 struct Channel;
@@ -31,13 +31,15 @@ class Response
 {
 public:
 	static void WHOIS(int client_fd, User *user);
+	static void TOPIC(int client_fd, IRCMessage message, serverInfo &info);
 
 
 	// in ServerMessage.cpp
 	static void send_message(int client_fd, std::string message);
-	static void requestForJoin(int client_fd);
+	static void requestForRegi(int client_fd);
 	static void checkMessage(int client_fd, IRCMessage message, serverInfo &info);
-
+	static void joinToChannel(int client_fd, IRCMessage message, serverInfo &info);
+	static void userPrefix(serverInfo &info);
 
 
 	// exception

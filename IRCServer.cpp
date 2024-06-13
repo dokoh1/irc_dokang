@@ -154,7 +154,6 @@ void IRCServer::message_handling(int client_fd)
 	size_t pos;
 	while (1)
 	{
-
 		pos = client_buffers[client_fd].find("\n"); // 버퍼에서 줄바꿈 문자를 찾음
 		if (pos == std::string::npos)
 			break;
@@ -163,7 +162,7 @@ void IRCServer::message_handling(int client_fd)
 		// std::cout << "Received message: " << message << std::endl; // 메시지를 출력
 		this->IRCMessageParse(message);
 		Response::checkMessage(client_fd, parsedMessage, serverinfo);
-		memset(&parsedMessage, 0, sizeof(IRCMessage));
+		memset(&parsedMessage, 0, sizeof(parsedMessage)); // 파싱된 메시지를 담는 구조체 초기화
 	}
 }
 
@@ -173,15 +172,4 @@ void IRCServer::client_remove(int client_fd)
 	poll_fd.erase(std::remove_if(poll_fd.begin(), poll_fd.end(), FDMatcher(client_fd)), poll_fd.end());
 	// 벡터에서 FDMatcher 함수 객체를 사용하여 클라이언트 파일 디스크립터와 일치하는 요소를 찾아 제거합니다.
 	client_buffers.erase(client_fd); // 맵에서 클라이언트 제거
-}
-
-User *IRCServer::findUser(std::string nick)
-{
-	std::vector<User *>::iterator it;
-	for (it = serverinfo.usersInServer.begin(); it != serverinfo.usersInServer.end(); ++it)
-	{
-		if ((*it)->nick == nick)
-			return (*it);
-	}
-	return (*it);
 }
