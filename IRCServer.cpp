@@ -5,6 +5,7 @@ IRCServer::IRCServer(const char *port, const char* password)
 {
 	this->serverinfo.serverName = "dokang";
 	this->serverinfo.server_pwd = password;
+	this->serverinfo.serverCreatedTime = getCreatedTimeReadable();
 
 	this -> listen_fd = create_bind(port); // 주어진 포트에 바인딩된 소켓을 생성
 	non_blocking(this -> listen_fd); // 소켓을 논블로킹 모드로 설정

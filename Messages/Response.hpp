@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/13 17:12:33 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/14 15:25:14 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,15 @@ class Response
 public:
 	static void WHOIS(int client_fd, User *user);
 	static void TOPIC(int client_fd, IRCMessage message, serverInfo &info);
-
+	static void MODE(int client_fd, IRCMessage message, serverInfo &info);
+	static void ToChannelUser(int client_fd, IRCMessage message, serverInfo &info);
 
 	// in ServerMessage.cpp
 	static void send_message(int client_fd, std::string message);
 	static void requestForRegi(int client_fd);
 	static void checkMessage(int client_fd, IRCMessage message, serverInfo &info);
 	static void joinToChannel(int client_fd, IRCMessage message, serverInfo &info);
-	static void userPrefix(serverInfo &info);
+	static void userPrefix(User *user, int receiveSocket);
 
 
 	// exception

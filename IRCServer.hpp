@@ -20,6 +20,13 @@
 #include "Messages/Response.hpp"
 
 #define BUFFER_SIZE 512 // 버퍼 크기를 512 바이트로 정의
+
+# define MODE_i 0
+# define MODE_t 1
+# define MODE_k 2
+# define MODE_o 3
+# define MODE_l 4
+
 struct User;
 
 struct Channel
@@ -30,6 +37,9 @@ struct Channel
 	User *operator_user;
 	int user_limit;
 	// 채널모드 변수 필요
+	
+	bool opt[5]; // itkol
+	std::string createdTime;
 
 	std::list<struct User *> channelUser;
 } ;
@@ -59,6 +69,7 @@ struct serverInfo
 {
 	std::string serverName;
 	std::string server_pwd; // 서버 연결 비밀번호
+	std::string serverCreatedTime;
 
 	std::list<User *> usersInServer; // 서버에 등록된 유저
 	std::list<Channel *> channelInServer; // 서버에 존재하는 채널

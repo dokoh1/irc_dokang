@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/13 17:35:06 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/14 16:46:46 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,29 +35,40 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 {
 	std::string chName = message.params[0].erase(0, 1);
 	User *requestUser = findUser(info, client_fd);
+	Channel *requestedChannel = findChannel(info, chName);
+	
 	// if (채널이 존재하지 않는 경우) -> 서버의 채널목록에 해당 채널을 추가
-	if (findChannel(info, chName) == *(info.channelInServer.end()))
+	if (requestedChannel == *(info.channelInServer.end()))
 	{
 		Channel *new_channel = new Channel();
 		new_channel->name = chName;
 		new_channel->channelUser.push_back(findUser(info, client_fd));
-		new_channel->operator_user = new_channel->channelUser.front();
+		new_channel->operator_user = requestUser;
+		new_channel->createdTime = getCreatedTimeUnix();
+		setChannelMode(new_channel, 0, 1, 0, 0, 0);		
 		info.channelInServer.push_back(new_channel);
+		requestedChannel = new_channel;
 		std::cout << "added channel: " << new_channel->name << '\n';
 	}
-	
+	else if (findUser(requestedChannel, client_fd) == *(requestedChannel->channelUser.end()))
+	{
+		requestedChannel->channelUser.push_back(requestUser);
+	}
+
+
 	// (채널이 이미 존재하는 경우 혹은 채널 생성 후) -> 해당 채널 ㅈㅓㅇ보 리턴
-	Response::userPrefix(info);
+	Response::userPrefix(findUser(info, client_fd), client_fd);
 	send_message(requestUser->client_fd, " JOIN :" + chName);
 	send_message(requestUser->client_fd, "\n:dokang 353 " 
 				+ requestUser->nick + " = " + chName 
-				+ " :hihia @hihi zz\n"); //	:irc.local 353 aa = #ch1 :@aa
+				+ " :" + channelUserList(requestedChannel) + '\n'); //	:irc.local 353 aa = #ch1 :@aa
 	
 	send_message(requestUser->client_fd, ":dokang 366 " 
 				+ requestUser->nick + " " + chName
 				+ " :End of /NAMES list."); //aa #ch1 :End of /NAMES list.
+	Response::ToChannelUser(client_fd, message, info);
 	send_message(requestUser->client_fd, "\r\n");
-	
+
 }
 
 void Response::WHOIS(int client_fd, User *user)
@@ -67,12 +78,12 @@ void Response::WHOIS(int client_fd, User *user)
 	send_message(client_fd, ":server 318 requester " + (user->nick) + " :End of WHOIS list\n");
 }
 
-void Response::userPrefix(serverInfo &info)
+void Response::userPrefix(User *user, int receiveSocket)
 {
-	send_message(info.usersInServer.back()->client_fd, ":");
-	send_message(info.usersInServer.back()->client_fd, info.usersInServer.back()->nick);
-	send_message(info.usersInServer.back()->client_fd, "!");
-	send_message(info.usersInServer.back()->client_fd, info.usersInServer.back()->username);
-	send_message(info.usersInServer.back()->client_fd, "@");
-	send_message(info.usersInServer.back()->client_fd, info.usersInServer.back()->hostname);	
+	send_message(receiveSocket, ":");
+	send_message(receiveSocket, user->nick);
+	send_message(receiveSocket, "!");
+	send_message(receiveSocket, user->username);
+	send_message(receiveSocket, "@");
+	send_message(receiveSocket, user->hostname);	
 }

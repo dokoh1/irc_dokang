@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/13 17:26:34 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/14 16:32:49 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "NICK"))
 	{
-
 		std::cout << "For debug : NICK \n";
 		info.usersInServer.back()->nick = message.params[0];
 	}
@@ -56,16 +55,13 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 
 		send_message(client_fd, ":dokang 001 " + info.usersInServer.back()->nick + " :Welcome to the FT_IRC Network dokang!root@127.0.0.1\n");
 		send_message(client_fd, ":dokang 002 " + info.usersInServer.back()->nick + " :Your host is irc.local by dokang\n");
-		send_message(client_fd, ":dokang 003 " + info.usersInServer.back()->nick + " :This server was created 03:34:23 Jun 08 2024\n");
+		send_message(client_fd, ":dokang 003 " + info.usersInServer.back()->nick + " :This server was created " + info.serverCreatedTime + '\n');
 		send_message(client_fd, ":dokang 004 " + info.usersInServer.back()->nick + " :dokang dokangv1 \"\" itkol\n");
-		// send_message(client_fd, ":irc.local 005 inspircd AWAYLEN=200 CASEMAPPING=rfc1459 CHANLIMIT=#:20 \n");
 		send_message(client_fd, "\r\n");
 	}
 	else if (isCommand(message, "PRIVMSG"))
 	{
-		// 해당 채널에 있는 모든 사람들에게 메세지가 들어가도록.
-		send_message(client_fd, "I GOT THE MESSAGE!\n");
-		send_message(client_fd, "\r\n");
+		Response::ToChannelUser(client_fd, message, info);
 	}
 	else if (isCommand(message, "KICK"))
 	{
@@ -81,7 +77,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "MODE"))
 	{
-
+		Response::MODE(client_fd, message, info);
 	}
 	else if (isCommand(message, "WHOIS"))
 	{
@@ -89,8 +85,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "PING"))
 	{
-		send_message(client_fd, "PONG ft_irc local");
-		send_message(client_fd, "\r\n");
+		send_message(client_fd, "PONG ft_irc local\r\n");
 	}
 	else
 	{
