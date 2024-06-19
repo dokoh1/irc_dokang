@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/14 15:25:14 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/19 18:48:42 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,13 @@ public:
 	static void WHOIS(int client_fd, User *user);
 	static void TOPIC(int client_fd, IRCMessage message, serverInfo &info);
 	static void MODE(int client_fd, IRCMessage message, serverInfo &info);
-	static void ToChannelUser(int client_fd, IRCMessage message, serverInfo &info);
+	static void INVITE(int client_fd, IRCMessage message, serverInfo &info);
+	static void	KICK(int client_fd, IRCMessage message, serverInfo &info);
+	static void ToChannelUser(int client_fd, IRCMessage message, serverInfo &info, bool includeMe);
+	static void ChannelModeToUser(int client_fd, IRCMessage message, serverInfo &info);
+	static void getChannelInfo(int client_fd, User *requestUser, Channel *ch);
 
+	static void getChannelBanlist(int client_fd, User *requestUser, Channel *ch);
 	// in ServerMessage.cpp
 	static void send_message(int client_fd, std::string message);
 	static void requestForRegi(int client_fd);

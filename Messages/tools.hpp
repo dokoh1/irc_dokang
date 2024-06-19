@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:44 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/14 16:46:22 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/16 19:46:00 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ bool isCorrectPassword(serverInfo &info, std::string &client_pw);
 User *findUser(serverInfo &info, std::string nick);
 User *findUser(serverInfo &info, int client_fd);
 User *findUser(Channel *ch, int client_fd);
+User *findUser(Channel *ch, std::string nick);
+User *findOPUser(Channel *ch, int client_fd);
 Channel *findChannel(serverInfo &info, std::string chName);
 std::string aftercolonConcat(IRCMessage message);
 std::string channelUserList(Channel *requestedChannel);
@@ -34,5 +36,10 @@ void setChannelMode(Channel *ch, bool i, bool t, bool k, bool o, bool l);
 std::string getChannelMode(Channel *ch);
 std::string getCreatedTimeUnix();
 std::string getCreatedTimeReadable();
+void changeChannelMode(int client_fd, Channel *ch, IRCMessage msg);
+std::string getMessageParams(IRCMessage message);
+
+void modifyChannelOpt(Channel *ch, IRCMessage msg);
+void unsetChannelOpt(Channel *ch, IRCMessage msg);
 
 #endif

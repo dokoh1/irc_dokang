@@ -34,7 +34,7 @@ struct Channel
 	std::string name;
 	std::string topic;
 	std::string key;
-	User *operator_user;
+	std::list<User *> operator_user;
 	int user_limit;
 	// 채널모드 변수 필요
 	
@@ -99,7 +99,6 @@ class IRCServer : public std::exception
 
 		//struct pollfd는 구조체는 readme에 설명이 있음
 		std::map<int, std::string> client_buffers; // 클라이언트 별로 수신된 데이터 버퍼를 저장
-		bool AuthenticationFailed;
 
 		// in IRCMessageParse.cpp
 		void IRCMessageParse(std::string message);

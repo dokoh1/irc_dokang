@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/14 16:46:46 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/19 19:56:20 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ void Response::requestForRegi(int client_fd)
 	// 451 응답코드에 패스워드 요청.
 	send_message(client_fd, ":irc.local 451 * JOIN :You have not registered.\n");
 	send_message(client_fd, "PASS <password>\n");
+	send_message(client_fd, "NICK <nickname>\n");
+	send_message(client_fd, "USER <username> <hostname> <servername> :<realname>\n");
 	return ;
 }
 
@@ -43,20 +45,35 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 		Channel *new_channel = new Channel();
 		new_channel->name = chName;
 		new_channel->channelUser.push_back(findUser(info, client_fd));
-		new_channel->operator_user = requestUser;
+		new_channel->operator_user.push_back(requestUser);
 		new_channel->createdTime = getCreatedTimeUnix();
-		setChannelMode(new_channel, 0, 1, 0, 0, 0);		
+		new_channel->key = "";
+		setChannelMode(new_channel, 0, 1, 0, 0, 0);
 		info.channelInServer.push_back(new_channel);
 		requestedChannel = new_channel;
-		std::cout << "added channel: " << new_channel->name << '\n';
+		// std::cout << "added channel: " << new_channel->name << '\n';
 	}
-	else if (findUser(requestedChannel, client_fd) == *(requestedChannel->channelUser.end()))
+	if (requestedChannel->opt[MODE_i] == true && findUser(requestedChannel, requestUser->nick) == *(requestedChannel->channelUser.end()))
+	{
+		send_message(client_fd, ":dokang 473 " + requestUser->nick + " #" + chName + " :Cannot join channel (invite only)\r\n");
+		return ;
+	}
+	else if (requestedChannel->opt[MODE_k] == true && (message.numParams < 2 || message.params[1] != requestedChannel->key))
+	{
+		send_message(client_fd, ":dokang 475 " + requestUser->nick + " #" + chName + " :Cannot join channel (incorrect channel key)\r\n");
+		return ;
+	} 
+	else if (requestedChannel->opt[MODE_l] == true && requestedChannel->user_limit <= static_cast<int>(requestedChannel->channelUser.size()))
+	{
+		send_message(client_fd, ":dokang 471 " + requestUser->nick + " #" + chName + " :Cannot join channel (channel is full)\r\n");
+		return ;
+	} 
+
+	if (findUser(requestedChannel, client_fd) == *(requestedChannel->channelUser.end()))
 	{
 		requestedChannel->channelUser.push_back(requestUser);
 	}
-
-
-	// (채널이 이미 존재하는 경우 혹은 채널 생성 후) -> 해당 채널 ㅈㅓㅇ보 리턴
+	
 	Response::userPrefix(findUser(info, client_fd), client_fd);
 	send_message(requestUser->client_fd, " JOIN :" + chName);
 	send_message(requestUser->client_fd, "\n:dokang 353 " 
@@ -66,7 +83,7 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 	send_message(requestUser->client_fd, ":dokang 366 " 
 				+ requestUser->nick + " " + chName
 				+ " :End of /NAMES list."); //aa #ch1 :End of /NAMES list.
-	Response::ToChannelUser(client_fd, message, info);
+	Response::ToChannelUser(client_fd, message, info, false);
 	send_message(requestUser->client_fd, "\r\n");
 
 }

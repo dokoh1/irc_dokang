@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 16:27:19 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/13 16:46:01 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/19 19:59:36 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,26 @@
 void IRCServer::IRCMessageParse(std::string message)
 {
 	std::stringstream ss;
+	std::string		  cmd;
 	std::string 	  param;
 	
 	ss << message;
+	parsedMessage.command = "";
 	parsedMessage.numParams = 0;
 	if (ss.peek() == ':')
 	{
 		ss >> parsedMessage.prefix;
 		parsedMessage.prefix.erase(0, 1);
 		
-		ss >> parsedMessage.command;		
+		ss >> cmd;
+		for (unsigned long i = 0; i < cmd.size(); i++)
+		{
+			if (isalpha(cmd[i]))
+				parsedMessage.command += toupper(cmd[i]);
+			else
+				parsedMessage.command += cmd[i];
+		}
+
 		while (ss >> param)
 		{
 			parsedMessage.params.push_back(param);
@@ -34,7 +44,16 @@ void IRCServer::IRCMessageParse(std::string message)
 	else
 	{
 		parsedMessage.prefix = "";
-		ss >> parsedMessage.command;		
+		
+		ss >> cmd;
+		for (unsigned long i = 0; i < cmd.size(); i++)
+		{
+			if (isalpha(cmd[i]))
+				parsedMessage.command += toupper(cmd[i]);
+			else
+				parsedMessage.command += cmd[i];
+		}
+		
 		while (ss >> param)
 		{
 			parsedMessage.params.push_back(param);

@@ -6,11 +6,12 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/14 16:55:25 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/19 19:56:02 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "tools.hpp"
+#include "Response.hpp"
 
 bool isCorrectPassword(serverInfo &info, std::string &client_pw)
 {
@@ -22,6 +23,17 @@ bool isCommand(IRCMessage msg, std::string cmd)
 	if (msg.command.find(cmd) != std::string::npos)
 		return (true);
 	return (false);
+}
+
+std::string getMessageParams(IRCMessage message)
+{
+	std::string params = message.params[0];
+
+	for (int i = 1; i < message.numParams; i++)
+	{
+		params += " " + message.params[i];
+	}
+	return (params);
 }
 
 std::string aftercolonConcat(IRCMessage message)
@@ -79,6 +91,31 @@ User *findUser(Channel *ch, int client_fd)
 	return (*it);
 }
 
+User *findUser(Channel *ch, std::string nick)
+{
+	std::list<User *>::iterator it;
+	
+	for (it = ch->channelUser.begin(); it != ch->channelUser.end(); ++it)
+	{
+		if ((*it)->nick == nick)
+			return (*it);
+	}
+	return (*it);
+}
+
+
+User *findOPUser(Channel *ch, int client_fd)
+{
+	std::list<User *>::iterator it;
+	
+	for (it = ch->operator_user.begin(); it != ch->operator_user.end(); ++it)
+	{
+		if ((*it)->client_fd == client_fd)
+			return (*it);
+	}
+	return (*it);
+}
+
 Channel *findChannel(serverInfo &info, std::string chName)
 {
 	std::list<Channel *>::iterator it;
@@ -97,8 +134,11 @@ std::string channelUserList(Channel *requestedChannel)
 	std::list<User *>::iterator it;
 	for (it = requestedChannel->channelUser.begin(); it != requestedChannel->channelUser.end();)
 	{
-		if ((*it)->nick == requestedChannel->operator_user->nick)
+		if (findOPUser(requestedChannel, (*it)->client_fd) != *(requestedChannel->operator_user.end()))
+		{
+			std::cout << "this is ops\n";
 			userList += "@";
+		}
 		userList += (*it)->nick;
 		if (++it != requestedChannel->channelUser.end())
 			userList += " ";
@@ -118,7 +158,7 @@ void setChannelMode(Channel *ch, bool i, bool t, bool k, bool o, bool l)
 
 std::string getChannelMode(Channel *ch)
 {
-	std::string setting = "";
+	std::string setting = "+";
 	if (ch->opt[MODE_i] == true)
 		setting += "i";
 	if (ch->opt[MODE_t] == true)
@@ -132,6 +172,74 @@ std::string getChannelMode(Channel *ch)
 	return (setting);
 }
 
+void changeChannelMode(int client_fd, Channel *ch, IRCMessage msg)
+{
+	if (msg.params[1][0] == '+')
+	{
+		modifyChannelOpt(ch, msg);
+	}
+	else if (msg.params[1][0] == '-')
+	{
+		unsetChannelOpt(ch, msg);
+	}
+	else
+	{
+		Response::send_message(client_fd, "dokang 401 " + findUser(ch, client_fd)->nick 
+							+ msg.params[1][0] + " :No such nick");
+	}
+}
+
+void modifyChannelOpt(Channel *ch, IRCMessage msg)
+{
+	std::string setting = msg.params[1];
+	int arguIdx = 2;
+	
+	if (setting.find('i') != std::string::npos)
+		ch->opt[MODE_i] = true;
+	if (setting.find('t') != std::string::npos)
+		ch->opt[MODE_t] = true;
+	if (setting.find('k') != std::string::npos)
+	{
+		ch->key = msg.params[arguIdx++];
+		ch->opt[MODE_k] = true;
+	}
+	if (setting.find('o') != std::string::npos)
+	{
+		ch->operator_user.push_back(findUser(ch, msg.params[arguIdx++]));
+		ch->opt[MODE_o] = true;
+	}
+	if (setting.find('l') != std::string::npos)
+	{
+		ch->user_limit = atoi(msg.params[arguIdx++].c_str());
+		if (ch->user_limit > 0 && ch->user_limit < 100)
+		ch->opt[MODE_l] = true;
+	}
+}
+
+void unsetChannelOpt(Channel *ch, IRCMessage msg)
+{
+	std::string setting = msg.params[1];
+	
+	if (setting.find('i') != std::string::npos)
+		ch->opt[MODE_i] = false;
+	if (setting.find('t') != std::string::npos)
+		ch->opt[MODE_t] = false;
+	if (setting.find('k') != std::string::npos)
+	{
+		ch->opt[MODE_k] = false;
+		ch->key = "";
+	}
+	if (setting.find('o') != std::string::npos)
+	{
+		ch->operator_user.remove(findOPUser(ch, findUser(ch, msg.params[2])->client_fd));
+		ch->opt[MODE_o] = false;
+	}
+	if (setting.find('l') != std::string::npos)
+	{
+		ch->opt[MODE_l] = false;
+		ch->user_limit = 9999;
+	}
+}
 std::string getCreatedTimeUnix()
 {
 	std::stringstream ss;
