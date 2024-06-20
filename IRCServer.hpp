@@ -34,14 +34,14 @@ struct Channel
 	std::string name;
 	std::string topic;
 	std::string key;
-	std::list<User *> operator_user;
+	std::list<User> operator_user;
 	int user_limit;
 	// 채널모드 변수 필요
 	
 	bool opt[5]; // itkol
 	std::string createdTime;
 
-	std::list<struct User *> channelUser;
+	std::list<struct User> channelUser;
 } ;
 
 struct User
@@ -53,6 +53,8 @@ struct User
 	std::string hostname;
 	std::string servername;
 	std::string realname;
+
+	bool auth;
 
 	std::map<int, std::string> client_buffers;
 };
@@ -71,8 +73,8 @@ struct serverInfo
 	std::string server_pwd; // 서버 연결 비밀번호
 	std::string serverCreatedTime;
 
-	std::list<User *> usersInServer; // 서버에 등록된 유저
-	std::list<Channel *> channelInServer; // 서버에 존재하는 채널
+	std::list<User> usersInServer; // 서버에 등록된 유저
+	std::list<Channel> channelInServer; // 서버에 존재하는 채널
 
 };
 

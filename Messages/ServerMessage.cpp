@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/19 20:01:39 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/20 19:53:33 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,35 +27,50 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	{
 		if (!isCorrectPassword(info, message.params[0]))
 		{
-			send_message(client_fd, ":localhost 464 Error: Password .\n");
+			send_message(client_fd, ":localhost 464 Error: Password incorrect.\r\n");
 		}
 		else
 		{
-			send_message(client_fd, "Password Correct! You are registered.\n");
-			User *new_user = new User();
-			new_user->client_fd = client_fd;
+			send_message(client_fd, "Password Correct! Register user infomation \"NICK <nickname>\" \"USER <username> <hostname> <servername> :<realname>\" \r\n");
+			User new_user;
+			new_user.client_fd = client_fd;
+			new_user.auth = true;
 			info.usersInServer.push_back(new_user);
 		}
 	}
 
 	else if (isCommand(message, "NICK"))
 	{
-		info.usersInServer.back()->nick = message.params[0];
+		User &user = findUser(info, client_fd);
+		
+		if (user.client_fd > 2 && user.auth == true)
+		{
+			std::cout << user.nick << " | " << user.client_fd << " | " << user.auth << message.params[0] << "\n";
+			user.nick = message.params[0];
+		}
 	}
 
 	else if (isCommand(message, "USER"))
 	{
-		info.usersInServer.back()->username = message.params[0];
-		info.usersInServer.back()->hostname = message.params[1];
-		info.usersInServer.back()->servername = message.params[2];
-		info.usersInServer.back()->realname = message.params[3];
-		
-		send_message(client_fd, ":dokang 001 " + info.usersInServer.back()->nick + " :Welcome to the ft_irc Network dokang!\n");
-		send_message(client_fd, ":dokang 002 " + info.usersInServer.back()->nick + " :Your host is ft_irc by dokang\n");
-		send_message(client_fd, ":dokang 003 " + info.usersInServer.back()->nick + " :This server was created " + info.serverCreatedTime + '\n');
-		send_message(client_fd, ":dokang 004 " + info.usersInServer.back()->nick + " dokang dokangv1 \"\" itkol :\n");
-		send_message(client_fd, ":dokang 005 " + info.usersInServer.back()->nick + " CASEMAPPING=rfc1459 KICKLEN=255 :are supported by this server\n");
-		send_message(client_fd, "\r\n");
+		User &user = findUser(info, client_fd);
+		std::cout << user.nick << " | " << user.auth << "\n";
+
+		if (user.nick != "" && user.auth == true)
+		{	
+			std::cout << "zz\n";
+			user.username = message.params[0];
+			user.hostname = message.params[1];
+			user.servername = message.params[2];
+			user.realname = message.params[3];
+			
+			std::cout << "SIBAL : "<< user.nick << " | " << user.username << " | " << user.hostname << " | " << user.servername << " | " << user.realname << "\n";
+			send_message(client_fd, ":dokang 001 " + user.nick + " :Welcome to the ft_irc Network dokang!\n");
+			send_message(client_fd, ":dokang 002 " + user.nick + " :Your host is ft_irc by dokang\n");
+			send_message(client_fd, ":dokang 003 " + user.nick + " :This server was created " + info.serverCreatedTime + '\n');
+			send_message(client_fd, ":dokang 004 " + user.nick + " dokang dokangv1 \"\" itkol :\n");
+			send_message(client_fd, ":dokang 005 " + user.nick + " CASEMAPPING=rfc1459 KICKLEN=255 :are supported by this server\n");
+			send_message(client_fd, "\r\n");
+		}
 	}
 	
 	else if (isCommand(message, "PRIVMSG"))

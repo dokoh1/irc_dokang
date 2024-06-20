@@ -7,6 +7,16 @@ IRCServer::IRCServer(const char *port, const char* password)
 	this->serverinfo.server_pwd = password;
 	this->serverinfo.serverCreatedTime = getCreatedTimeReadable();
 
+	User dummyUser;
+	dummyUser.nick = "";
+	dummyUser.auth = false;
+	dummyUser.client_fd = -1;
+	this->serverinfo.usersInServer.push_back(dummyUser);
+
+	Channel dummyCh;
+	dummyCh.name = "";
+	this->serverinfo.channelInServer.push_back(dummyCh);
+
 	this -> listen_fd = create_bind(port); // 주어진 포트에 바인딩된 소켓을 생성
 	non_blocking(this -> listen_fd); // 소켓을 논블로킹 모드로 설정
 	listen(this -> listen_fd, SOMAXCONN); // 소켓을 수신 대기 상태로 설정
