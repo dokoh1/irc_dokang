@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/20 19:53:33 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/21 15:28:13 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,12 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	
 	if (isCommand(message, "JOIN"))
 	{
+		std::cout << "CHANNEL LIST : ";
+		for (std::list<Channel>::iterator it = info.channelInServer.begin(); it != info.channelInServer.end(); ++it)
+		{
+			std::cout << (*it).name << "|";
+		}
+		std::cout << "\n";
 		if (message.params[0] == ":")
 			Response::requestForRegi(client_fd);
 		else

@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/20 20:31:30 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/21 15:17:27 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,11 +119,13 @@ User& findOPUser(Channel &ch, int client_fd)
 Channel& findChannel(serverInfo &info, std::string chName)
 {
 	std::list<Channel>::iterator it;
-	
-	for (it = ++(info.channelInServer.begin()); it != info.channelInServer.end(); ++it)
+
+	for (it = info.channelInServer.begin(); it != info.channelInServer.end(); ++it)
 	{
 		if ((*it).name == chName)
+		{
 			return (*it);
+		}
 	}
 	return (*info.channelInServer.begin());
 }
