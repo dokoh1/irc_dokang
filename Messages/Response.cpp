@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/20 19:55:16 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/21 15:32:58 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 	Channel &requestedChannel = findChannel(info, chName);
 	
 	// if (채널이 존재하지 않는 경우) -> 서버의 채널목록에 해당 채널을 추가
-	if (requestedChannel.name == "")
+	if (requestedChannel.name != chName)
 	{
 		Channel new_channel;
 		User dummyUser;
@@ -57,9 +57,8 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 		new_channel.key = "";
 		setChannelMode(new_channel, 0, 1, 0, 0, 0);
 		info.channelInServer.push_back(new_channel);
-		requestedChannel = info.channelInServer.back();
+		requestedChannel = info.channelInServer.back(); // ?
 	}
-	
 	if (requestedChannel.opt[MODE_i] == true && findUser(requestedChannel, requestUser.nick).nick == "")
 	{
 		send_message(client_fd, ":dokang 473 " + requestUser.nick + " #" + chName + " :Cannot join channel (invite only)\r\n");

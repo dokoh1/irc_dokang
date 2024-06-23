@@ -27,6 +27,9 @@ IRCServer::IRCServer(const char *port, const char* password)
 
 	Channel dummyCh;
 	dummyCh.name = "";
+	dummyCh.channelUser.push_back(dummyUser);
+	dummyCh.operator_user.push_back(dummyUser);
+	
 	this->serverinfo.channelInServer.push_back(dummyCh);
 
 	this -> listen_fd = create_bind(port); // 주어진 포트에 바인딩된 소켓을 생성
