@@ -84,6 +84,7 @@ class IRCServer : public std::exception
 		IRCServer(const char* port, const char* password); //서버 초기화(생성자)
 		virtual ~IRCServer() throw(); //소멸자
 		void run(); //서버의 메인 루프를 실행
+		void cleanup();
 	private:
 		serverInfo serverinfo;
 		std::string serverName;
@@ -95,7 +96,6 @@ class IRCServer : public std::exception
 		int listen_fd; // listen 소켓 파일 디스크립터
 		std::string server_pwd; // 서버 연결 비밀번호
 		std::vector<struct pollfd> poll_fd; // 폴링할 파일 디스크립터 목록 
-
 		// std::vector<User *> usersInServer; // 서버에 등록된 유저
 		// std::vector<Channel *> channelInServer; // 서버에 존재하는 채널
 
@@ -106,5 +106,8 @@ class IRCServer : public std::exception
 		void IRCMessageParse(std::string message);
 		IRCMessage parsedMessage;
 };
+
+extern IRCServer *global_instance;
+void handle_signal(int sig);
 
 #endif
