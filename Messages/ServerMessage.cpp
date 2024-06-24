@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/22 17:23:03 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 11:07:42 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,15 +74,15 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			user.servername = message.params[2];
 			user.realname = message.params[3];
 			
-			// if (user.nickComplete == true)
-			// {
-			// 	send_message(client_fd, ":dokang 001 " + user.nick + " :Welcome to the ft_irc Network dokang!\n");
-			// 	send_message(client_fd, ":dokang 002 " + user.nick + " :Your host is ft_irc by dokang\n");
-			// 	send_message(client_fd, ":dokang 003 " + user.nick + " :This server was created " + info.serverCreatedTime + '\n');
-			// 	send_message(client_fd, ":dokang 004 " + user.nick + " dokang dokangv1 \"\" itkol :\n");
-			// 	send_message(client_fd, ":dokang 005 " + user.nick + " CASEMAPPING=rfc1459 KICKLEN=255 :are supported by this server\n");
-			// 	send_message(client_fd, "\r\n");
-			// }
+			if (user.nickComplete == true)
+			{
+				send_message(client_fd, ":dokang 001 " + user.nick + " :Welcome to the ft_irc Network dokang!\n");
+				send_message(client_fd, ":dokang 002 " + user.nick + " :Your host is ft_irc by dokang\n");
+				send_message(client_fd, ":dokang 003 " + user.nick + " :This server was created " + info.serverCreatedTime + '\n');
+				send_message(client_fd, ":dokang 004 " + user.nick + " dokang dokangv1 io itkol :bklov\n");
+				send_message(client_fd, ":dokang 005 " + user.nick + " CASEMAPPING=rfc1459 KICKLEN=255 :are supported by this server\n");
+				send_message(client_fd, "\r\n");
+			}
 		}
 	}
 	

@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/21 18:08:31 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 11:12:15 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 	}
 	
 	Response::userPrefix(requestUser, client_fd);
-	send_message(requestUser.client_fd, " JOIN :" + chName);
+	send_message(requestUser.client_fd, " JOIN :#" + chName);
 	send_message(requestUser.client_fd, "\n:dokang 353 "
 				+ requestUser.nick + " = " + chName 
 				+ " :" + channelUserList(requestedChannel) + '\n'); //	:irc.local 353 aa = #ch1 :@aa

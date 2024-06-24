@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:13:57 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/22 16:24:04 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 11:17:47 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,14 @@
 
 void Response:: MODE(int client_fd, IRCMessage message, serverInfo &info)
 {
-	if (findChannel(info, message.params[0]).name == "")
-		return ;
 	Channel &ch = findChannel(info, message.params[0]);
+	if (findChannel(info, message.params[0]).name != message.params[0])
+	{
+		User &usr = findUser(info, client_fd);
+		userPrefix(usr, client_fd);
+		send_message(client_fd, " MODE " + usr.nick + " :+i \r\n");
+		return ;
+	}
 	User &requestUser = findUser(ch, client_fd);
 
 	if (message.numParams == 1) // 채널명만 왔을경우 . 채널정보 리턴
