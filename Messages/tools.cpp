@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/24 15:32:48 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 19:26:00 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,8 +178,8 @@ std::string getChannelMode(Channel &ch)
 		setting += "t";
 	if (ch.opt[MODE_k] == true)
 		setting += "k";
-	if (ch.opt[MODE_o] == true)
-		setting += "o";
+	// if (ch.opt[MODE_o] == true)
+		// setting += "o";
 	if (ch.opt[MODE_l] == true)
 		setting += "l";
 	return (setting);
@@ -195,86 +195,121 @@ void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg)
 	{
 		unsetChannelOpt(client_fd, ch, msg);
 	}
-	else
-	{
-		Response::send_message(client_fd, "dokang 401 " + (findUser(ch, client_fd)).nick 
-							+ msg.params[1][0] + " :No such nick");
-	}
+	// else
+	// {
+	// 	Response::send_message(client_fd, "dokang 401 " + (findUser(ch, client_fd)).nick
+	// 						+ msg.params[1][0] + " :No such nick");
+	// }
 }
 
 void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];
 	int arguIdx = 2;
+	User &user = findUser(ch, client_fd);
 	
-	if (setting.find('i') != std::string::npos)
-		ch.opt[MODE_i] = true;
-	if (setting.find('t') != std::string::npos)
-		ch.opt[MODE_t] = true;
-	if (setting.find('k') != std::string::npos )
+	for (size_t i = 1; i < msg.params[1].size(); i++)
 	{
-		if (msg.numParams >= 3)
+		if (setting[i] == 'i')
+			ch.opt[MODE_i] = true;
+		else if (setting[i] == 't')
+			ch.opt[MODE_t] = true;
+		else if (setting[i] == 'k')
 		{
-			ch.key = msg.params[arguIdx++];
-			ch.opt[MODE_k] = true;
+			if (msg.numParams >= 3)
+			{
+				ch.key = msg.params[arguIdx++];
+				ch.opt[MODE_k] = true;
+			}
+			else
+			{
+				Response::send_message(client_fd, "dokang 696 " + user.nick + " #" + ch.name 
+									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+			}
+		}
+		else if (setting[i] == 'o')
+		{
+			User getPrivilegeUser = findUser(ch, msg.params[arguIdx++]);
+			if (getPrivilegeUser.nick == "")
+			{
+				Response::rpl401_modeErr(client_fd, user, msg.params[arguIdx - 1]);
+				continue ;
+			}
+			
+			if (findOPUser(ch, client_fd).nick == "")
+			{
+				Response::rpl482(client_fd, user, ch.name);
+				continue ;
+			}
+
+			if (findOPUser(ch, getPrivilegeUser.client_fd).nick == "")
+				ch.operator_user.push_back(getPrivilegeUser);
+
+			// Response::ChannelModeToUser(client_fd, msg, ch);
+			ch.opt[MODE_o] = true;
+		}
+		else if (setting[i] == 'l')
+		{
+			ch.user_limit = atoi(msg.params[arguIdx++].c_str());
+			std::cout <<"user_limit: " << ch.user_limit << '\n';
+			if (ch.user_limit > 0 && ch.user_limit < 100)
+				ch.opt[MODE_l] = true;
 		}
 		else
 		{
-			Response::send_message(client_fd, "dokang 696 " + findUser(ch, client_fd).nick + " #" + ch.name 
-								+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+			Response::rpl472(client_fd, user, setting[i]);
 		}
 	}
-	if (setting.find('o') != std::string::npos)
-	{
-		ch.operator_user.push_back(findUser(ch, msg.params[arguIdx++]));
-		ch.opt[MODE_o] = true;
-	}
-	if (setting.find('l') != std::string::npos)
-	{
-		ch.user_limit = atoi(msg.params[arguIdx++].c_str());
-		if (ch.user_limit > 0 && ch.user_limit < 100)
-		ch.opt[MODE_l] = true;
-	}
+
 }
 
 void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];
+	User &user = findUser(ch, client_fd);
 	
-	if (setting.find('i') != std::string::npos)
-		ch.opt[MODE_i] = false;
-	if (setting.find('t') != std::string::npos)
-		ch.opt[MODE_t] = false;
-	if (setting.find('k') != std::string::npos)
+	for (size_t i = 1; i < msg.params[1].size(); i++)
 	{
-		if (msg.numParams >= 3 && ch.key == msg.params[2])
+		if (setting[i] == 'i')
+			ch.opt[MODE_i] = false;
+		else if (setting[i] == 't')
+			ch.opt[MODE_t] = false;
+		else if (setting[i] == 'k')
 		{
-			ch.opt[MODE_k] = false;
-			ch.key = "";
+			if (msg.numParams >= 3 && ch.key == msg.params[2])
+			{
+				ch.opt[MODE_k] = false;
+				ch.key = "";
+			}
+			else
+			{
+				Response::send_message(client_fd, "dokang 696 " + user.nick + " #" + ch.name 
+									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+			}
+		}
+		else if (setting[i] == 'o')
+		{
+			User &unsetPrivilegeUser = findUser(ch, msg.params[2]);
+			ch.opt[MODE_o] = false;
+			findOPUser(ch, unsetPrivilegeUser.nick);
+			for (std::list<User>::iterator it = ch.operator_user.begin(); it != ch.operator_user.end(); ++it)
+			{
+				if ((*it).nick == unsetPrivilegeUser.nick)
+				{
+					ch.operator_user.erase(it);
+					break ;
+				}
+			}
+		}
+		else if (setting[i] == 'l')
+		{
+			ch.opt[MODE_l] = false;
+			ch.user_limit = 9999;
 		}
 		else
 		{
-			Response::send_message(client_fd, "dokang 696 " + findUser(ch, client_fd).nick + " #" + ch.name 
-								+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+			Response::rpl472(client_fd, user, setting[i]);
 		}
-	}
-	if (setting.find('o') != std::string::npos)
-	{
-		User user = findUser(ch, msg.params[2]);
-		for (std::list<User>::iterator it = ch.operator_user.begin(); it != ch.operator_user.end(); ++it)
-		{
-			if ((*it).nick == user.nick)
-			{
-				ch.operator_user.erase(it);
-				break ;
-			}
-		}
-		ch.opt[MODE_o] = false;
-	}
-	if (setting.find('l') != std::string::npos)
-	{
-		ch.opt[MODE_l] = false;
-		ch.user_limit = 9999;
 	}
 }
 std::string getCreatedTimeUnix()
@@ -313,16 +348,18 @@ void EraseUserInChannel(Channel &ch, User &usr)
 			break;
 		}
 	}
+}
 
-	if (findOPUser(ch, usr.nick).nick != "")
+void EraseOPInChannel(Channel &ch, User &usr)
+{
+	std::list<User>::iterator it;
+
+	for (it = ch.operator_user.begin(); it != ch.operator_user.end(); ++it)
 	{
-		for (it = ch.channelUser.begin(); it != ch.channelUser.end(); ++it)
+		if ((*it).nick == usr.nick)
 		{
-			if ((*it).nick == usr.nick)
-			{
-				ch.operator_user.erase(it);
-				break;
-			}
-		}		
+			ch.operator_user.erase(it);
+			break;
+		}
 	}
 }

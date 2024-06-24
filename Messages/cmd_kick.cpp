@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 18:47:37 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/24 15:47:58 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 19:03:52 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ void Response::KICK(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	
 	Response::KickInformToChannelUser(client_fd, message, info);
+	EraseOPInChannel(ch, kickedUser);
 	EraseUserInChannel(ch, kickedUser);
 }
 

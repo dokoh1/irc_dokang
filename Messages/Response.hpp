@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/24 15:47:28 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 18:53:51 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ public:
 	static void INVITE(int client_fd, IRCMessage message, serverInfo &info);
 	static void	KICK(int client_fd, IRCMessage message, serverInfo &info);
 	static void ToChannelUser(int client_fd, IRCMessage message, serverInfo &info, bool includeMe);
-	static void ChannelModeToUser(int client_fd, IRCMessage message, serverInfo &info);
+	static void ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch);
 	static void getChannelInfo(int client_fd, User &requestUser, Channel &ch);
 	static void KickInformToChannelUser(int client_fd, IRCMessage message, serverInfo &info);
 
@@ -64,6 +64,9 @@ public:
 	static void rpl442(int client_fd, User &user, std::string chName);
 	static void rpl461(int client_fd, User &user, IRCMessage message);
 	static void rpl482(int client_fd, User &user, std::string chName);
+	static void rpl472(int client_fd, User &user, char wrongMode);
+
+	static void rpl401_modeErr(int client_fd, User &OPuser, std::string targetUser);
 };
 
 #endif
