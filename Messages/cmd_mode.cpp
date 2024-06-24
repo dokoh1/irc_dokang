@@ -6,18 +6,18 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:13:57 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/20 18:37:21 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/22 16:24:04 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-void Response::MODE(int client_fd, IRCMessage message, serverInfo &info)
+void Response:: MODE(int client_fd, IRCMessage message, serverInfo &info)
 {
 	if (findChannel(info, message.params[0]).name == "")
 		return ;
-	Channel ch = findChannel(info, message.params[0]);
-	User requestUser = findUser(ch, client_fd);
+	Channel &ch = findChannel(info, message.params[0]);
+	User &requestUser = findUser(ch, client_fd);
 
 	if (message.numParams == 1) // 채널명만 왔을경우 . 채널정보 리턴
 	{
@@ -57,7 +57,7 @@ void Response::ChannelModeToUser(int client_fd, IRCMessage message, serverInfo &
 void Response::getChannelInfo(int client_fd, User &requestUser, Channel &ch)
 {
 	send_message(client_fd, ":dokang 324 " + requestUser.nick + " #" 
-				+ ch.name + " :" + getChannelMode(ch) + "\r\n");
+				+ ch.name + " :" + getChannelMode(ch) + "\n");
 	send_message(client_fd, ":dokang 329 " + requestUser.nick + " #"
 				+ ch.name + " :" + ch.createdTime + "\r\n");	
 }

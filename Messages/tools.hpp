@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:44 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/20 15:31:24 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/22 16:20:00 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ std::string getCreatedTimeReadable();
 void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg);
 std::string getMessageParams(IRCMessage message);
 
-void modifyChannelOpt(Channel &ch, IRCMessage msg);
-void unsetChannelOpt(Channel &ch, IRCMessage msg);
+void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
+void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
 
 #endif

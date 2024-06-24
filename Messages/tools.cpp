@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/21 15:17:27 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/22 16:21:18 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,11 +177,11 @@ void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg)
 {
 	if (msg.params[1][0] == '+')
 	{
-		modifyChannelOpt(ch, msg);
+		modifyChannelOpt(client_fd, ch, msg);
 	}
 	else if (msg.params[1][0] == '-')
 	{
-		unsetChannelOpt(ch, msg);
+		unsetChannelOpt(client_fd, ch, msg);
 	}
 	else
 	{
@@ -190,7 +190,7 @@ void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg)
 	}
 }
 
-void modifyChannelOpt(Channel &ch, IRCMessage msg)
+void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];
 	int arguIdx = 2;
@@ -199,10 +199,18 @@ void modifyChannelOpt(Channel &ch, IRCMessage msg)
 		ch.opt[MODE_i] = true;
 	if (setting.find('t') != std::string::npos)
 		ch.opt[MODE_t] = true;
-	if (setting.find('k') != std::string::npos)
+	if (setting.find('k') != std::string::npos )
 	{
-		ch.key = msg.params[arguIdx++];
-		ch.opt[MODE_k] = true;
+		if (msg.numParams >= 3)
+		{
+			ch.key = msg.params[arguIdx++];
+			ch.opt[MODE_k] = true;
+		}
+		else
+		{
+			Response::send_message(client_fd, "dokang 696 " + findUser(ch, client_fd).nick + " #" + ch.name 
+								+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+		}
 	}
 	if (setting.find('o') != std::string::npos)
 	{
@@ -217,7 +225,7 @@ void modifyChannelOpt(Channel &ch, IRCMessage msg)
 	}
 }
 
-void unsetChannelOpt(Channel &ch, IRCMessage msg)
+void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];
 	
@@ -227,8 +235,16 @@ void unsetChannelOpt(Channel &ch, IRCMessage msg)
 		ch.opt[MODE_t] = false;
 	if (setting.find('k') != std::string::npos)
 	{
-		ch.opt[MODE_k] = false;
-		ch.key = "";
+		if (msg.numParams >= 3 && ch.key == msg.params[2])
+		{
+			ch.opt[MODE_k] = false;
+			ch.key = "";
+		}
+		else
+		{
+			Response::send_message(client_fd, "dokang 696 " + findUser(ch, client_fd).nick + " #" + ch.name 
+								+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+		}
 	}
 	if (setting.find('o') != std::string::npos)
 	{

@@ -55,6 +55,7 @@ struct User
 	std::string realname;
 
 	bool auth;
+	bool nickComplete;
 
 	std::map<int, std::string> client_buffers;
 };
