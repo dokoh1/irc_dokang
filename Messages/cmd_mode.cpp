@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:13:57 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/24 11:17:47 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 14:06:30 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void Response:: MODE(int client_fd, IRCMessage message, serverInfo &info)
 {
 	Channel &ch = findChannel(info, message.params[0]);
-	if (findChannel(info, message.params[0]).name != message.params[0])
+	if (findChannel(info, message.params[0]).name == "")
 	{
 		User &usr = findUser(info, client_fd);
 		userPrefix(usr, client_fd);
@@ -48,6 +48,8 @@ void Response::ChannelModeToUser(int client_fd, IRCMessage message, serverInfo &
 	Channel &receivedChannel = findChannel(info, message.params[0]);
 	
 	std::list<User>::iterator it;
+
+	std::cout << sender.nick << " | " << receivedChannel.name << '\n';
 	for (it = ++(receivedChannel.channelUser.begin()); it != receivedChannel.channelUser.end(); ++it)
 	{
 		userPrefix(sender, (*it).client_fd);

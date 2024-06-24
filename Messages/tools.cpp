@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/22 16:21:18 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 15:32:48 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,18 @@ User& findOPUser(Channel &ch, int client_fd)
 	for (it = ch.operator_user.begin(); it != ch.operator_user.end(); ++it)
 	{
 		if ((*it).client_fd == client_fd)
+			return (*it);
+	}
+	return (*ch.operator_user.begin());
+}
+
+User& findOPUser(Channel &ch, std::string nick)
+{
+	std::list<User>::iterator it;
+	
+	for (it = ch.operator_user.begin(); it != ch.operator_user.end(); ++it)
+	{
+		if ((*it).nick == nick)
 			return (*it);
 	}
 	return (*ch.operator_user.begin());
@@ -287,4 +299,30 @@ std::string getCreatedTimeReadable()
     std::strftime(buffer, 32, "%H:%M:%S %b %d %Y", ptm);
 	std::string ret = buffer;
 	return ret;
+}
+
+void EraseUserInChannel(Channel &ch, User &usr)
+{
+	std::list<User>::iterator it;
+
+	for (it = ch.channelUser.begin(); it != ch.channelUser.end(); ++it)
+	{
+		if ((*it).nick == usr.nick)
+		{
+			ch.channelUser.erase(it);
+			break;
+		}
+	}
+
+	if (findOPUser(ch, usr.nick).nick != "")
+	{
+		for (it = ch.channelUser.begin(); it != ch.channelUser.end(); ++it)
+		{
+			if ((*it).nick == usr.nick)
+			{
+				ch.operator_user.erase(it);
+				break;
+			}
+		}		
+	}
 }

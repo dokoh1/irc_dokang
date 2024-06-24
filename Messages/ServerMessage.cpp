@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/24 11:07:42 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 14:02:04 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,10 +91,10 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		Response::ToChannelUser(client_fd, message, info, false);
 	}
 
-	// else if (isCommand(message, "KICK"))
-	// {
-	// 	Response::KICK(client_fd, message, info);
-	// }
+	else if (isCommand(message, "KICK"))
+	{
+		Response::KICK(client_fd, message, info);
+	}
 
 	else if (isCommand(message, "INVITE"))
 	{

@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:44 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/22 16:20:00 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 14:29:26 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ User& findUser(serverInfo &info, int client_fd);
 User& findUser(Channel &ch, int client_fd);
 User& findUser(Channel &ch, std::string nick);
 User& findOPUser(Channel &ch, int client_fd);
+User& findOPUser(Channel &ch, std::string nick);
 Channel& findChannel(serverInfo &info, std::string chName);
 std::string aftercolonConcat(IRCMessage message);
 std::string channelUserList(Channel &requestedChannel);
@@ -41,5 +42,6 @@ std::string getMessageParams(IRCMessage message);
 
 void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
 void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
+void EraseUserInChannel(Channel &ch, User &usr);
 
 #endif

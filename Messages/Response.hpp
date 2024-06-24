@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/20 14:49:44 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 15:47:28 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ public:
 	static void ToChannelUser(int client_fd, IRCMessage message, serverInfo &info, bool includeMe);
 	static void ChannelModeToUser(int client_fd, IRCMessage message, serverInfo &info);
 	static void getChannelInfo(int client_fd, User &requestUser, Channel &ch);
+	static void KickInformToChannelUser(int client_fd, IRCMessage message, serverInfo &info);
 
 	static void getChannelBanlist(int client_fd, User &requestUser, Channel& ch);
 	// in ServerMessage.cpp
@@ -56,7 +57,13 @@ public:
 		{
 			return "[Exception] Error : Message sending failed";
 		}
+
 	};
+	
+	static void rpl441(int client_fd, User &user, IRCMessage message);
+	static void rpl442(int client_fd, User &user, std::string chName);
+	static void rpl461(int client_fd, User &user, IRCMessage message);
+	static void rpl482(int client_fd, User &user, std::string chName);
 };
 
 #endif
