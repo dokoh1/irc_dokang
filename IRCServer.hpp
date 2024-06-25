@@ -85,10 +85,6 @@ class IRCServer : public std::exception
 		IRCServer(const char* port, const char* password); //서버 초기화(생성자)
 		virtual ~IRCServer() throw(); //소멸자
 		void run(); //서버의 메인 루프를 실행
-<<<<<<< HEAD
-=======
-		// void cleanup();
->>>>>>> e0aaeadd827889b3efc3238386a75ff3c3a73d81
 	private:
 		serverInfo serverinfo;
 		std::string serverName;
