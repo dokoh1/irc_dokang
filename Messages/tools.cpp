@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/24 19:26:00 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/25 15:25:34 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -336,16 +336,28 @@ std::string getCreatedTimeReadable()
 	return ret;
 }
 
-void EraseUserInChannel(Channel &ch, User &usr)
+void EraseUserInChannel(Channel &ch, User &usr, serverInfo &info)
 {
 	std::list<User>::iterator it;
 
-	for (it = ch.channelUser.begin(); it != ch.channelUser.end(); ++it)
+	for (it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
 	{
 		if ((*it).nick == usr.nick)
 		{
 			ch.channelUser.erase(it);
 			break;
+		}
+	}
+
+	if (ch.channelUser.size() == 1)
+	{
+		for (std::list<Channel>::iterator it = ++(info.channelInServer.begin()); it != info.channelInServer.end(); ++it)
+		{
+			if ((*it).name == ch.name)
+			{
+				info.channelInServer.erase(it);
+				break ;
+			}
 		}
 	}
 }
@@ -354,7 +366,7 @@ void EraseOPInChannel(Channel &ch, User &usr)
 {
 	std::list<User>::iterator it;
 
-	for (it = ch.operator_user.begin(); it != ch.operator_user.end(); ++it)
+	for (it = ++(ch.operator_user.begin()); it != ch.operator_user.end(); ++it)
 	{
 		if ((*it).nick == usr.nick)
 		{

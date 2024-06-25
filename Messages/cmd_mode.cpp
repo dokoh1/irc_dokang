@@ -6,33 +6,35 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:13:57 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/24 19:19:10 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/25 13:48:22 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-void Response:: MODE(int client_fd, IRCMessage message, serverInfo &info)
+void Response::MODE(int client_fd, IRCMessage message, serverInfo &info)
 {
-	Channel &ch = findChannel(info, message.params[0]);
-	if (findChannel(info, message.params[0]).name == "")
+	User &usr = findUser(info, client_fd);
+	if (message.params[0].front() != '#')
 	{
-		User &usr = findUser(info, client_fd);
 		userPrefix(usr, client_fd);
-		send_message(client_fd, " MODE " + usr.nick + " :+i\r\n");
+		send_message(client_fd, " MODE " + message.params[0] + " :+i\r\n");
 		return ;
 	}
 
-	User &requestUser = findUser(ch, client_fd);
+	Channel &ch = findChannel(info, message.params[0].erase(0, 1));
+
+	// User &requestUser = findUser(ch, client_fd);
 	if (message.numParams == 1) // 채널명만 왔을경우 . 채널정보 리턴
 	{
-		Response::getChannelInfo(client_fd, requestUser, ch);
+		Response::getChannelInfo(client_fd, usr, ch);
 	}
 	else
 	{
 		if (findOPUser(ch, client_fd).nick == "")
 		{
-			send_message(client_fd, ":dokang 482 " + requestUser.nick + " #" + ch.name + " :You must be a channel op");
+			send_message(client_fd, ":dokang 482 " + usr.nick + " #" 
+						+ ch.name + " :You must be a channel op");
 			send_message(client_fd, "\r\n");
 			return ;
 		}

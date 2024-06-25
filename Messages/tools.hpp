@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:44 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/24 19:03:35 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/25 12:27:34 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ std::string getMessageParams(IRCMessage message);
 
 void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
 void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
-void EraseUserInChannel(Channel &ch, User &usr);
+void EraseUserInChannel(Channel &ch, User &usr, serverInfo &info);
 void EraseOPInChannel(Channel &ch, User &usr);
 
 #endif

@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerMessage.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dokoh <dokoh@student.42.fr>                +#+  +:+       +#+        */
+/*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2024/06/24 11:53:13 by dokoh            ###   ########.fr       */
-=======
-/*   Updated: 2024/06/24 14:02:04 by sihkang          ###   ########seoul.kr  */
->>>>>>> e0aaeadd827889b3efc3238386a75ff3c3a73d81
+/*   Updated: 2024/06/25 16:08:32 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +15,21 @@
 void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 {
 	
+	std::cout << "* * * * CHANNEL IN SERVER : ";
+
+	for (std::list<Channel>::iterator it = info.channelInServer.begin(); it != info.channelInServer.end(); ++it)
+		std::cout << (*it).name << "|";
+	std::cout << '\n';
+	// std::cout << "*  * * * USER IN SERVER : ";
+
+	// for (std::list<User>::iterator it = info.usersInServer.begin(); it != info.usersInServer.end(); ++it)
+	// 	std::cout << (*it).nick << " ";
+	// std::cout << '\n';
+
+
+
 	if (isCommand(message, "JOIN"))
 	{
-		std::cout << "CHANNEL LIST : ";
-		for (std::list<Channel>::iterator it = info.channelInServer.begin(); it != info.channelInServer.end(); ++it)
-		{
-			std::cout << (*it).name << "|";
-		}
-		std::cout << "\n";
 		if (message.params[0] == ":")
 			Response::requestForRegi(client_fd);
 		else
@@ -37,19 +40,13 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	{
 		if (!isCorrectPassword(info, message.params[0]))
 		{
-			send_message(client_fd, ":localhost 464 Error: Password incorrect.\r\n");
+			rpl464(client_fd);
 		}
 		else
 		{
-			send_message(client_fd, "Password Correct! Register user infomation \"NICK <nickname>\" \"USER <username> <hostname> <servername> :<realname>\" \r\n");
-			User new_user;
-			new_user.client_fd = client_fd;
-			new_user.auth = true;
-			new_user.nickComplete = false;
-			info.usersInServer.push_back(new_user);
+			rpl_passCorrect(client_fd, info);
 		}
 	}
-
 	else if (isCommand(message, "NICK"))
 	{
 		User &user = findUser(info, client_fd);
@@ -62,6 +59,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			{
 				user.nick = message.params[0];
 				user.nickComplete = true;
+				rpl_connection(client_fd, user, info);
 			}
 		}
 	}
@@ -78,16 +76,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			user.hostname = message.params[1];
 			user.servername = message.params[2];
 			user.realname = message.params[3];
-			
-			if (user.nickComplete == true)
-			{
-				send_message(client_fd, ":dokang 001 " + user.nick + " :Welcome to the ft_irc Network dokang!\n");
-				send_message(client_fd, ":dokang 002 " + user.nick + " :Your host is ft_irc by dokang\n");
-				send_message(client_fd, ":dokang 003 " + user.nick + " :This server was created " + info.serverCreatedTime + '\n');
-				send_message(client_fd, ":dokang 004 " + user.nick + " dokang dokangv1 io itkol :bklov\n");
-				send_message(client_fd, ":dokang 005 " + user.nick + " CASEMAPPING=rfc1459 KICKLEN=255 :are supported by this server\n");
-				send_message(client_fd, "\r\n");
-			}
+			rpl_connection(client_fd, user, info);
 		}
 	}
 	
@@ -120,6 +109,10 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	else if (isCommand(message, "PING"))
 	{
 		send_message(client_fd, "PONG ft_irc local\r\n");
+	}
+	else if (isCommand(message, "QUIT"))
+	{
+		Response::QUIT(client_fd, info);
 	}
 	else
 	{
