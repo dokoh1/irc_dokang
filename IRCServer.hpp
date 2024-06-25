@@ -84,7 +84,6 @@ class IRCServer : public std::exception
 		IRCServer(const char* port, const char* password); //서버 초기화(생성자)
 		virtual ~IRCServer() throw(); //소멸자
 		void run(); //서버의 메인 루프를 실행
-		void cleanup();
 	private:
 		serverInfo serverinfo;
 		std::string serverName;
@@ -100,14 +99,12 @@ class IRCServer : public std::exception
 		// std::vector<Channel *> channelInServer; // 서버에 존재하는 채널
 
 		//struct pollfd는 구조체는 readme에 설명이 있음
-		std::map<int, std::string> client_buffers; // 클라이언트 별로 수신된 데이터 버퍼를 저장
+		std::map<int, std::string> client_buffers;
+		std::map<int, std::string> temp_message; // 클라이언트 별로 수신된 데이터 버퍼를 저장
 
 		// in IRCMessageParse.cpp
 		void IRCMessageParse(std::string message);
 		IRCMessage parsedMessage;
 };
-
-extern IRCServer *global_instance;
-void handle_signal(int sig);
 
 #endif

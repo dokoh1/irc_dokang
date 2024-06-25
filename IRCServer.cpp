@@ -1,18 +1,6 @@
 #include "IRCServer.hpp"
 #include "FDMatcher.hpp"
 
-IRCServer *global_instance = 0;
-
-void handle_signal(int sig)
-{
-	(void)sig;
-	if (global_instance != 0)
-	{
-		global_instance -> cleanup();
-	}
-	exit(0);
-}
-
 IRCServer::IRCServer(const char *port, const char* password)
 {
 	this->serverinfo.serverName = "dokang";
@@ -40,23 +28,15 @@ IRCServer::IRCServer(const char *port, const char* password)
 	pfd.fd = this -> listen_fd; // 폴 구조체의 파일 디스크립터를 listen 소켓으로 설정합니다.
 	pfd.events = POLLIN; // 읽기 가능한 이벤트를 설정합니다.
 	poll_fd.push_back(pfd); // listen 소켓을 폴링할 파일 디스크립터 목록에 추가합니다.
-	global_instance = this;
-	signal(SIGINT, handle_signal);
 }
 
 IRCServer::~IRCServer() throw()
 {
-	cleanup();
-}
-
-void IRCServer::cleanup()
-{
 	close(listen_fd); // listen 소켓을 닫습니다.
 	for (size_t i = 1; i < poll_fd.size(); ++i)  // i = 0 은 listen 소켓이다.
 		close(poll_fd[i].fd); // 모든 클라이언트 소켓을 닫습니다.
-	poll_fd.clear();
-	client_buffers.clear();
 }
+
 int IRCServer::create_bind(const char* port)
 {
 	struct addrinfo want;
@@ -165,35 +145,85 @@ void IRCServer::connection_handling()
 	client_buffers[client_fd] = ""; // 버퍼 초기화
 }
 
+// void IRCServer::message_handling(int client_fd)
+// {
+// 	char buffer[BUFFER_SIZE]; // 버퍼를 선언하고 초기화합니다
+// 	std::memset(buffer, 0, BUFFER_SIZE); // 버퍼를 0으로 초기화합니다.
+
+// 	int nread = read(client_fd, buffer, BUFFER_SIZE); // 클라이언트 소켓으로부터 데이터를 읽음
+// 	if (nread == -1)
+// 	{
+// 		std::cerr << "read error" << std::endl;
+// 		client_remove(client_fd);
+// 		return ;
+// 	}
+
+// 	if (nread == 0) // 읽은 데이터가 없으면 클라이언트 제거
+// 	{
+// 		client_remove(client_fd);
+// 		return ;
+// 	}
+// 	client_buffers[client_fd] += std::string(buffer, nread); // 읽은 데이터를 버퍼에 추가
+// 	size_t pos = client_buffers[client_fd].find("\r\n");
+// 	while (pos != std::string::npos)
+// 	{
+// 		std::string message = client_buffers[client_fd].substr(0, pos); //메시지 추출
+// 		client_buffers[client_fd].erase(0, pos + 2); // 추출한 메시지를 버퍼에서 제거
+// 		// std::cout << "Received message: " << message << std::endl; // 메시지를 출력
+// 		this->IRCMessageParse(message);
+// 		Response::checkMessage(client_fd, parsedMessage, serverinfo);
+// 		memset(&parsedMessage, 0, sizeof(parsedMessage)); // 파싱된 메시지를 담는 구조체 초기화
+// 	}
+// }
+
+
+// TODO : 1. 각 클라이언트에 할당된 메세지 버퍼를 보관해야함
+// 		2. 해당 버퍼에 메세지가 남아있으면 이전에 남아있는 메시지와 현재 들어온 메세지를 합쳐야함
+//		3. 메세지를 합쳐서 보관한 것을, \r\n이 들어왔으면 한번에 처리를 해야함
 void IRCServer::message_handling(int client_fd)
 {
-	char buffer[BUFFER_SIZE]; // 버퍼를 선언하고 초기화합니다
-	std::memset(buffer, 0, BUFFER_SIZE); // 버퍼를 0으로 초기화합니다.
-
-	int nread = read(client_fd, buffer, BUFFER_SIZE); // 클라이언트 소켓으로부터 데이터를 읽음
-	if (nread == -1)
-	{
-		std::cerr << "read error" << std::endl;
-		client_remove(client_fd);
-		return ;
-	}
-
-	if (nread == 0) // 읽은 데이터가 없으면 클라이언트 제거
-	{
-		client_remove(client_fd);
-		return ;
-	}
-	client_buffers[client_fd] += std::string(buffer, nread); // 읽은 데이터를 버퍼에 추가
-	size_t pos = client_buffers[client_fd].find("\r\n");
-	while (pos != std::string::npos)
-	{
-		std::string message = client_buffers[client_fd].substr(0, pos); //메시지 추출
-		client_buffers[client_fd].erase(0, pos + 2); // 추출한 메시지를 버퍼에서 제거
-		// std::cout << "Received message: " << message << std::endl; // 메시지를 출력
-		this->IRCMessageParse(message);
-		Response::checkMessage(client_fd, parsedMessage, serverinfo);
-		memset(&parsedMessage, 0, sizeof(parsedMessage)); // 파싱된 메시지를 담는 구조체 초기화
-	}
+    char buffer[BUFFER_SIZE]; // 버퍼를 선언하고 초기화합니다
+    std::memset(buffer, 0, BUFFER_SIZE); // 버퍼를 0으로 초기화합니다.
+    int nread = read(client_fd, buffer, BUFFER_SIZE); // 클라이언트 소켓으로부터 데이터를 읽음
+    if (nread == -1)
+    {
+        std::cerr << "read error" << std::endl;
+        client_remove(client_fd);
+        return ;
+    }
+    if (nread == 0) // 읽은 데이터가 없으면 클라이언트 제거
+    {
+        client_remove(client_fd);
+        return ;
+    }
+    client_buffers[client_fd] += std::string(buffer, nread); // 읽은 데이터를 버퍼에 추가
+    size_t pos;
+	size_t pos_temp = temp_message[client_fd].length();
+    while (1)
+    {
+		// nc -> ctrl + v + m -> \r\n
+		// std::cout << "\n";
+		for (size_t i = 0; i < client_buffers[client_fd].length(); ++i)
+		{
+			std::cout << (int)client_buffers[client_fd][i] << " ";
+		}
+		std::cout << "\n";
+        pos = client_buffers[client_fd].find("\r\n"); // 버퍼에서 줄바꿈 문자를 찾음
+        if (pos == std::string::npos) {
+			// 기존에 들어온 메세지를 보관해서, 나중에 들어오는 메세지랑 합쳐서 처리하는 부분이 있어야함
+			temp_message[client_fd] += client_buffers[client_fd].substr(0, pos);
+			client_buffers[client_fd].clear();
+            break;
+		}
+		pos_temp += pos;
+		temp_message[client_fd] += client_buffers[client_fd].substr(0, pos);
+		client_buffers[client_fd].erase(0, pos + 2);
+        std::string message = temp_message[client_fd].substr(0, pos_temp); //메시지 추출
+        temp_message[client_fd].clear(); // 추출한 메시지를 버퍼에서 제거
+        this->IRCMessageParse(message);
+        Response::checkMessage(client_fd, parsedMessage, serverinfo);
+        memset(&parsedMessage, 0, sizeof(parsedMessage)); // 파싱된 메시지를 담는 구조체 초기화
+    }
 }
 
 void IRCServer::client_remove(int client_fd)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerMessage.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
+/*   By: dokoh <dokoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/21 15:28:13 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 11:53:13 by dokoh            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	else if (isCommand(message, "USER"))
 	{
 		User &user = findUser(info, client_fd);
+		std::cout << "DeBug Test\n";
 		std::cout << user.nick << " | " << user.auth << "\n";
 
 		if (user.nick != "" && user.auth == true)
