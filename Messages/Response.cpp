@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/25 15:56:11 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/25 20:01:09 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 		send_message(client_fd, ":dokang 475 " + requestUser.nick + " #" + chName + " :Cannot join channel (incorrect channel key)\r\n");
 		return ;
 	} 
-	else if (requestedChannel.opt[MODE_l] == true && requestedChannel.user_limit <= static_cast<int>(requestedChannel.channelUser.size()))
+	else if (requestedChannel.opt[MODE_l] == true && requestedChannel.user_limit + 1 <= static_cast<int>(requestedChannel.channelUser.size()))
 	{
 		send_message(client_fd, ":dokang 471 " + requestUser.nick + " #" + chName + " :Cannot join channel (channel is full)\r\n");
 		return ;

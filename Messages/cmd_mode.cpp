@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:13:57 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/25 13:48:22 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/25 19:54:12 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void Response::MODE(int client_fd, IRCMessage message, serverInfo &info)
 	User &usr = findUser(info, client_fd);
 	if (message.params[0].front() != '#')
 	{
-		userPrefix(usr, client_fd);
-		send_message(client_fd, " MODE " + message.params[0] + " :+i\r\n");
+		// userPrefix(usr, client_fd);
+		// send_message(client_fd, " MODE " + message.params[0] + " :+i\r\n");
 		return ;
 	}
 
@@ -31,6 +31,8 @@ void Response::MODE(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else
 	{
+		if (message.params[1] == "b")
+			return ;
 		if (findOPUser(ch, client_fd).nick == "")
 		{
 			send_message(client_fd, ":dokang 482 " + usr.nick + " #" 
@@ -40,7 +42,7 @@ void Response::MODE(int client_fd, IRCMessage message, serverInfo &info)
 		}
 
 		changeChannelMode(client_fd, ch, message);
-		Response::ChannelModeToUser(client_fd, message, ch);
+		// Response::ChannelModeToUser(client_fd, message, ch);
 	}
 	send_message(client_fd, "\r\n");
 }
@@ -50,7 +52,7 @@ void Response::ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch)
 	User &sender = findUser(ch, client_fd);
 	
 	std::list<User>::iterator it;
-	std::string params = message.params[0];
+	std::string params = '#' + message.params[0];
 	int i;
 	for (i = 1; i < message.numParams - 1; i++)
 	{

@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/25 15:25:34 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/25 19:55:46 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,11 +202,15 @@ void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg)
 	// }
 }
 
+
+
 void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];
 	int arguIdx = 2;
 	User &user = findUser(ch, client_fd);
+	std::string validOption = '#' + msg.params[0] + " +";
+	std::string validArgument = "";
 	
 	for (size_t i = 1; i < msg.params[1].size(); i++)
 	{
@@ -225,11 +229,13 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 			{
 				Response::send_message(client_fd, "dokang 696 " + user.nick + " #" + ch.name 
 									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+				continue;
 			}
 		}
 		else if (setting[i] == 'o')
 		{
-			User getPrivilegeUser = findUser(ch, msg.params[arguIdx++]);
+			User &getPrivilegeUser = findUser(ch, msg.params[arguIdx++]);
+			std::cout << "set +o mode :[" << getPrivilegeUser.nick << "]\n";
 			if (getPrivilegeUser.nick == "")
 			{
 				Response::rpl401_modeErr(client_fd, user, msg.params[arguIdx - 1]);
@@ -244,25 +250,58 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 
 			if (findOPUser(ch, getPrivilegeUser.client_fd).nick == "")
 				ch.operator_user.push_back(getPrivilegeUser);
-
-			// Response::ChannelModeToUser(client_fd, msg, ch);
 			ch.opt[MODE_o] = true;
 		}
 		else if (setting[i] == 'l')
 		{
 			ch.user_limit = atoi(msg.params[arguIdx++].c_str());
-			std::cout <<"user_limit: " << ch.user_limit << '\n';
 			if (ch.user_limit > 0 && ch.user_limit < 100)
 				ch.opt[MODE_l] = true;
+			else
+				continue;
 		}
 		else
 		{
 			Response::rpl472(client_fd, user, setting[i]);
+			continue;
+		}
+		
+		validOption += setting[i];
+		if (setting[i] == 'k' || setting[i] == 'o' || setting[i] == 'l')
+		{
+			validArgument += msg.params[arguIdx - 1];
+			if (arguIdx <= msg.numParams)
+				validArgument += " ";
 		}
 	}
 
+	for (std::list<User>::iterator it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
+	{
+		Response::userPrefix(user, (*it).client_fd);
+		Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n");
+	}
 }
 
+// void Response::ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch)
+// {
+// 	User &sender = findUser(ch, client_fd);
+	
+// 	std::list<User>::iterator it;
+// 	std::string params = '#' + message.params[0];
+// 	int i;
+// 	for (i = 1; i < message.numParams - 1; i++)
+// 	{
+// 		params += " " + message.params[i];
+// 	}
+// 	params += " :" + message.params[i];
+
+// 	for (it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
+// 	{
+// 		userPrefix(sender, (*it).client_fd);
+// 		send_message((*it).client_fd, " " + message.command + " " + params);
+// 		send_message((*it).client_fd, "\r\n");
+// 	}
+// }
 void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];

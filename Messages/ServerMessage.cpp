@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/25 16:08:32 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/25 16:24:11 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,10 +102,10 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	{
 		Response::MODE(client_fd, message, info);
 	}
-	else if (isCommand(message, "WHOIS"))
-	{
-		Response::WHOIS(client_fd, findUser(info, message.params[0]));
-	}
+	// else if (isCommand(message, "WHOIS"))
+	// {
+	// 	Response::WHOIS(client_fd, findUser(info, message.params[0]));
+	// }
 	else if (isCommand(message, "PING"))
 	{
 		send_message(client_fd, "PONG ft_irc local\r\n");
