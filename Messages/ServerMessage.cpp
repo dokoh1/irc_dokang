@@ -6,7 +6,11 @@
 /*   By: dokoh <dokoh@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2024/06/24 11:53:13 by dokoh            ###   ########.fr       */
+=======
+/*   Updated: 2024/06/24 14:02:04 by sihkang          ###   ########seoul.kr  */
+>>>>>>> e0aaeadd827889b3efc3238386a75ff3c3a73d81
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +45,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			User new_user;
 			new_user.client_fd = client_fd;
 			new_user.auth = true;
+			new_user.nickComplete = false;
 			info.usersInServer.push_back(new_user);
 		}
 	}
@@ -48,11 +53,16 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	else if (isCommand(message, "NICK"))
 	{
 		User &user = findUser(info, client_fd);
-		
 		if (user.client_fd > 2 && user.auth == true)
 		{
 			std::cout << user.nick << " | " << user.client_fd << " | " << user.auth << message.params[0] << "\n";
-			user.nick = message.params[0];
+			if (findUser(info, message.params[0]).nick != "")
+				send_message(client_fd, ":dokang 433 * " + message.params[0] + " :Nickname is already in use.\r\n");
+			else
+			{
+				user.nick = message.params[0];
+				user.nickComplete = true;
+			}
 		}
 	}
 
@@ -62,21 +72,22 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		std::cout << "DeBug Test\n";
 		std::cout << user.nick << " | " << user.auth << "\n";
 
-		if (user.nick != "" && user.auth == true)
-		{	
-			std::cout << "zz\n";
+		if (user.auth == true)
+		{
 			user.username = message.params[0];
 			user.hostname = message.params[1];
 			user.servername = message.params[2];
 			user.realname = message.params[3];
 			
-			std::cout << "SIBAL : "<< user.nick << " | " << user.username << " | " << user.hostname << " | " << user.servername << " | " << user.realname << "\n";
-			send_message(client_fd, ":dokang 001 " + user.nick + " :Welcome to the ft_irc Network dokang!\n");
-			send_message(client_fd, ":dokang 002 " + user.nick + " :Your host is ft_irc by dokang\n");
-			send_message(client_fd, ":dokang 003 " + user.nick + " :This server was created " + info.serverCreatedTime + '\n');
-			send_message(client_fd, ":dokang 004 " + user.nick + " dokang dokangv1 \"\" itkol :\n");
-			send_message(client_fd, ":dokang 005 " + user.nick + " CASEMAPPING=rfc1459 KICKLEN=255 :are supported by this server\n");
-			send_message(client_fd, "\r\n");
+			if (user.nickComplete == true)
+			{
+				send_message(client_fd, ":dokang 001 " + user.nick + " :Welcome to the ft_irc Network dokang!\n");
+				send_message(client_fd, ":dokang 002 " + user.nick + " :Your host is ft_irc by dokang\n");
+				send_message(client_fd, ":dokang 003 " + user.nick + " :This server was created " + info.serverCreatedTime + '\n');
+				send_message(client_fd, ":dokang 004 " + user.nick + " dokang dokangv1 io itkol :bklov\n");
+				send_message(client_fd, ":dokang 005 " + user.nick + " CASEMAPPING=rfc1459 KICKLEN=255 :are supported by this server\n");
+				send_message(client_fd, "\r\n");
+			}
 		}
 	}
 	
@@ -85,10 +96,10 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		Response::ToChannelUser(client_fd, message, info, false);
 	}
 
-	// else if (isCommand(message, "KICK"))
-	// {
-	// 	Response::KICK(client_fd, message, info);
-	// }
+	else if (isCommand(message, "KICK"))
+	{
+		Response::KICK(client_fd, message, info);
+	}
 
 	else if (isCommand(message, "INVITE"))
 	{

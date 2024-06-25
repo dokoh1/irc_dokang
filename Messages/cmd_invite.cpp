@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/15 14:35:37 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/20 15:45:59 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 14:06:04 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 void Response::INVITE(int client_fd, IRCMessage message, serverInfo &info)
 {
-	User requestUser = findUser(info, client_fd);
+	User &requestUser = findUser(info, client_fd);
 
-	User invitedUser = findUser(info, message.params[0]);
+	User &invitedUser = findUser(info, message.params[0]);
 	if (findUser(info, message.params[0]).nick == "")
 	{
 		send_message(client_fd, ":dokang 401 " + requestUser.nick 
@@ -24,13 +24,12 @@ void Response::INVITE(int client_fd, IRCMessage message, serverInfo &info)
 		return ;
 	}
 	
-	Channel ch;
-	if (message.params[1].front() != '#')
-		ch = findChannel(info, message.params[1]);
-	else
-		ch = findChannel(info, message.params[1].erase(0,1));
+	std::string chName = message.params[1];
+	if (chName[0] == '#')
+		chName = chName.erase(0, 1);
 
-	if (findChannel(info, message.params[1]).name == "")
+	Channel &ch = findChannel(info, chName);
+	if (ch.name == "")
 	{
 		send_message(client_fd, ":dokang 403 " + requestUser.nick 
 					+ " #" + message.params[1] + " :No such channel\r\n");

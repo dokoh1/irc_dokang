@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 16:03:41 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/20 15:38:50 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/21 18:01:06 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 void Response::TOPIC(int client_fd, IRCMessage message, serverInfo &info)
 {
 	std::string chName = message.params[0];
-	Channel ch = findChannel(info, chName);
-	User user = findUser(ch, client_fd);
+	Channel &ch = findChannel(info, chName);
+	User &user = findUser(ch, client_fd);
 	std::string chTopic = aftercolonConcat(message);
 	ch.topic = chTopic;
 	if (ch.opt[MODE_t] == true && findOPUser(ch, client_fd).nick == "")

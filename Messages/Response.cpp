@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/21 15:32:58 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/24 14:05:46 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 {
 	std::string chName = message.params[0].erase(0, 1);
 	User &requestUser = findUser(info, client_fd);
-	Channel &requestedChannel = findChannel(info, chName);
+	// Channel &requestedChannel = findChannel(info, chName);
 	
 	// if (채널이 존재하지 않는 경우) -> 서버의 채널목록에 해당 채널을 추가
-	if (requestedChannel.name != chName)
+	if (findChannel(info, chName).name == "")
 	{
 		Channel new_channel;
 		User dummyUser;
@@ -57,8 +57,10 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 		new_channel.key = "";
 		setChannelMode(new_channel, 0, 1, 0, 0, 0);
 		info.channelInServer.push_back(new_channel);
-		requestedChannel = info.channelInServer.back(); // ?
 	}
+
+	Channel &requestedChannel = findChannel(info, chName);
+
 	if (requestedChannel.opt[MODE_i] == true && findUser(requestedChannel, requestUser.nick).nick == "")
 	{
 		send_message(client_fd, ":dokang 473 " + requestUser.nick + " #" + chName + " :Cannot join channel (invite only)\r\n");
@@ -82,7 +84,7 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 	}
 	
 	Response::userPrefix(requestUser, client_fd);
-	send_message(requestUser.client_fd, " JOIN :" + chName);
+	send_message(requestUser.client_fd, " JOIN :#" + chName);
 	send_message(requestUser.client_fd, "\n:dokang 353 "
 				+ requestUser.nick + " = " + chName 
 				+ " :" + channelUserList(requestedChannel) + '\n'); //	:irc.local 353 aa = #ch1 :@aa

@@ -13,7 +13,7 @@
 #include <fcntl.h> // 파일 제어 옵션을 설정하기 위해 포함
 #include <unistd.h> // 유닉스 표준 함수 정의를 포함
 #include <poll.h> // I/O 다중화를 위해 "poll"함수를 사용하기 위해 포함
-
+#include <signal.h>
 #include <exception>
 #include <sstream>
 
@@ -55,6 +55,7 @@ struct User
 	std::string realname;
 
 	bool auth;
+	bool nickComplete;
 
 	std::map<int, std::string> client_buffers;
 };
@@ -84,6 +85,10 @@ class IRCServer : public std::exception
 		IRCServer(const char* port, const char* password); //서버 초기화(생성자)
 		virtual ~IRCServer() throw(); //소멸자
 		void run(); //서버의 메인 루프를 실행
+<<<<<<< HEAD
+=======
+		// void cleanup();
+>>>>>>> e0aaeadd827889b3efc3238386a75ff3c3a73d81
 	private:
 		serverInfo serverinfo;
 		std::string serverName;
