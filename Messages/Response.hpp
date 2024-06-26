@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/25 12:07:23 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 14:53:57 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ public:
 
 
 	// exception
-	class sendMessageException
+	class sendMessageException : public std::exception
 	{
 	public:
 		virtual const char * what() const throw()
@@ -63,6 +63,7 @@ public:
 	
 	static void rpl_connection(int client_fd, User &user, serverInfo &info);
 	static void rpl_passCorrect(int client_fd, serverInfo &info);	
+	static void rpl421(int client_fd, IRCMessage message);
 	static void rpl441(int client_fd, User &user, IRCMessage message);
 	static void rpl442(int client_fd, User &user, std::string chName);
 	static void rpl461(int client_fd, User &user, IRCMessage message);

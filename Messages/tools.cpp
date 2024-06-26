@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 11:55:36 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 14:49:38 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ bool isCorrectPassword(serverInfo &info, std::string &client_pw)
 
 bool isCommand(IRCMessage msg, std::string cmd)
 {
-	if (msg.command.find(cmd) != std::string::npos)
+	if (msg.command.find(cmd) != std::string::npos && msg.command.size() == cmd.size())
 		return (true);
 	return (false);
 }

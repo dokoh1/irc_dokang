@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/25 20:01:09 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 14:40:16 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,15 @@
 
 void Response::send_message(int client_fd, std::string message)
 {
-	if (write(client_fd, message.c_str(), message.size()) == -1)
-		throw sendMessageException();
+	try
+	{	
+		if (write(client_fd, message.c_str(), message.size()) == -1)
+			throw sendMessageException();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 	return ;
 }
 

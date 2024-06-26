@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 11:16:07 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 14:54:39 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,13 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	
 	else if (isCommand(message, "PASS"))
 	{
-		if (!isCorrectPassword(info, message.params[0]))
+		if (message.numParams == 1 && isCorrectPassword(info, message.params[0]))
 		{
-			rpl464(client_fd);
+			rpl_passCorrect(client_fd, info);
 		}
 		else
 		{
-			rpl_passCorrect(client_fd, info);
+			rpl464(client_fd);
 		}
 	}
 	else if (isCommand(message, "NICK"))
@@ -51,12 +51,11 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			else
 			{
 				user.nick = message.params[0];
-				user.nickComplete = true;
 				rpl_connection(client_fd, user, info);
+				user.nickComplete = true;
 			}
 		}
 	}
-
 	else if (isCommand(message, "USER"))
 	{
 		User &user = findUser(info, client_fd);
@@ -71,17 +70,14 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			rpl_connection(client_fd, user, info);
 		}
 	}
-	
 	else if (isCommand(message, "PRIVMSG"))
 	{
 		Response::ToChannelUser(client_fd, message, info, false);
 	}
-
 	else if (isCommand(message, "KICK"))
 	{
 		Response::KICK(client_fd, message, info);
 	}
-
 	else if (isCommand(message, "INVITE"))
 	{
 		Response::INVITE(client_fd, message, info);
@@ -94,10 +90,6 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	{
 		Response::MODE(client_fd, message, info);
 	}
-	// else if (isCommand(message, "WHOIS"))
-	// {
-	// 	Response::WHOIS(client_fd, findUser(info, message.params[0]));
-	// }
 	else if (isCommand(message, "PING"))
 	{
 		send_message(client_fd, "PONG ft_irc local\r\n");
@@ -108,7 +100,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else
 	{
-		// wrong command
+		Response::rpl421(client_fd, message);
 	}
 }
 
