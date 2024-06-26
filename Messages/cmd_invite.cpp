@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/15 14:35:37 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 11:34:26 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 12:29:06 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,26 @@
 
 void Response::INVITE(int client_fd, IRCMessage message, serverInfo &info)
 {
+	
+	std::string chName = message.params[1];
+	if (chName[0] == '#')
+		chName = chName.erase(0, 1);
+	Channel &ch = findChannel(info, chName);
 	User &requestUser = findUser(info, client_fd);
-
 	User &invitedUser = findUser(info, message.params[0]);
+	
+	if (findOPUser(ch, requestUser.nick).nick == "")
+	{
+		rpl482(client_fd, requestUser, "#" + ch.name);
+		return ;
+	}
+	
 	if (findUser(info, message.params[0]).nick == "")
 	{
 		send_message(client_fd, ":dokang 401 " + requestUser.nick 
 					+ " " + message.params[0] + " :No such nick\r\n");
 		return ;
 	}
-	
-	std::string chName = message.params[1];
-	if (chName[0] == '#')
-		chName = chName.erase(0, 1);
-
-	Channel &ch = findChannel(info, chName);
 	if (ch.name == "")
 	{
 		send_message(client_fd, ":dokang 403 " + requestUser.nick 
