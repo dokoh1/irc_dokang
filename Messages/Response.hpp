@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 14:53:57 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 16:21:27 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ public:
 	static void	KICK(int client_fd, IRCMessage message, serverInfo &info);
 	static void QUIT(int client_fd, serverInfo &info);
 	static void ToChannelUser(int client_fd, IRCMessage message, serverInfo &info, bool includeMe);
+	static void addNewChannel(User &requestUser, std::string chName, serverInfo &info);
 	static void ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch);
 	static void getChannelInfo(int client_fd, User &requestUser, Channel &ch);
 	static void KickInformToChannelUser(int client_fd, IRCMessage message, serverInfo &info);
@@ -63,7 +64,7 @@ public:
 	
 	static void rpl_connection(int client_fd, User &user, serverInfo &info);
 	static void rpl_passCorrect(int client_fd, serverInfo &info);	
-	static void rpl421(int client_fd, IRCMessage message);
+	static void rpl421(int client_fd);
 	static void rpl441(int client_fd, User &user, IRCMessage message);
 	static void rpl442(int client_fd, User &user, std::string chName);
 	static void rpl461(int client_fd, User &user, IRCMessage message);

@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 14:49:38 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 18:20:22 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,8 +178,6 @@ std::string getChannelMode(Channel &ch)
 		setting += "t";
 	if (ch.opt[MODE_k] == true)
 		setting += "k";
-	// if (ch.opt[MODE_o] == true)
-		// setting += "o";
 	if (ch.opt[MODE_l] == true)
 		setting += "l";
 	return (setting);
@@ -195,14 +193,12 @@ void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg)
 	{
 		unsetChannelOpt(client_fd, ch, msg);
 	}
-	// else
-	// {
-	// 	Response::send_message(client_fd, "dokang 401 " + (findUser(ch, client_fd)).nick
-	// 						+ msg.params[1][0] + " :No such nick");
-	// }
+	else
+	{
+		Response::send_message(client_fd, "dokang 401 " + (findUser(ch, client_fd)).nick
+							+ msg.params[1][0] + " :No such nick");
+	}
 }
-
-
 
 void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
@@ -282,30 +278,13 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 	}
 }
 
-// void Response::ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch)
-// {
-// 	User &sender = findUser(ch, client_fd);
-	
-// 	std::list<User>::iterator it;
-// 	std::string params = '#' + message.params[0];
-// 	int i;
-// 	for (i = 1; i < message.numParams - 1; i++)
-// 	{
-// 		params += " " + message.params[i];
-// 	}
-// 	params += " :" + message.params[i];
-
-// 	for (it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
-// 	{
-// 		userPrefix(sender, (*it).client_fd);
-// 		send_message((*it).client_fd, " " + message.command + " " + params);
-// 		send_message((*it).client_fd, "\r\n");
-// 	}
-// }
 void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];
+	int arguIdx = 2;
 	User &user = findUser(ch, client_fd);
+	std::string validOption = '#' + msg.params[0] + " -";
+	std::string validArgument = "";
 	
 	for (size_t i = 1; i < msg.params[1].size(); i++)
 	{
@@ -349,8 +328,22 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 		{
 			Response::rpl472(client_fd, user, setting[i]);
 		}
+
+		validOption += setting[i];
+		if (setting[i] == 'k' || setting[i] == 'o')
+		{
+			validArgument += msg.params[arguIdx - 1];
+			if (arguIdx <= msg.numParams)
+				validArgument += " ";
+		}
+	}
+	for (std::list<User>::iterator it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
+	{
+		Response::userPrefix(user, (*it).client_fd);
+		Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n");
 	}
 }
+
 std::string getCreatedTimeUnix()
 {
 	std::stringstream ss;
@@ -375,7 +368,7 @@ std::string getCreatedTimeReadable()
 	return ret;
 }
 
-void EraseUserInChannel(Channel &ch, User &usr, serverInfo &info)
+void EraseUserInChannel(Channel &ch, User &usr)
 {
 	std::list<User>::iterator it;
 
@@ -388,6 +381,21 @@ void EraseUserInChannel(Channel &ch, User &usr, serverInfo &info)
 		}
 	}
 
+	// if (ch.channelUser.size() == 1)
+	// {
+	// 	for (std::list<Channel>::iterator it = ++(info.channelInServer.begin()); it != info.channelInServer.end(); ++it)
+	// 	{
+	// 		if ((*it).name == ch.name)
+	// 		{
+	// 			info.channelInServer.erase(it);
+	// 			break ;
+	// 		}
+	// 	}
+	// }
+}
+
+void EraseChannelInServer(Channel &ch, serverInfo &info)
+{
 	if (ch.channelUser.size() == 1)
 	{
 		for (std::list<Channel>::iterator it = ++(info.channelInServer.begin()); it != info.channelInServer.end(); ++it)

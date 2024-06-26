@@ -1,10 +1,10 @@
 NAME = Ircserv
-CPPFLAGS = -Werror -Wall -Wextra -std=c++98 -g
+CPPFLAGS = -Werror -Wall -Wextra -std=c++98 -g -fsanitize=address
 SRC = main.cpp FDMatcher.cpp IRCServer.cpp 
-SRCMSG = Messages/ServerMessage.cpp Messages/tools.cpp Messages/Response.cpp Messages/cmd_topic.cpp Messages/cmd_privmsg.cpp Messages/cmd_mode.cpp Messages/cmd_invite.cpp Messages/cmd_kick.cpp Messages/rpl.cpp
-SRCPRS = Parsing/IRCMessageParse.cpp
+SRCMSG = Messages/IRCMessageParse.cpp Messages/ServerMessage.cpp Messages/tools.cpp Messages/Response.cpp Messages/rpl.cpp
+SRCCMD = command/cmd_topic.cpp command/cmd_privmsg.cpp command/cmd_mode.cpp command/cmd_invite.cpp command/cmd_kick.cpp command/cmd_quit.cpp
 
-OBJ = $(SRC:.cpp=.o) $(SRCMSG:.cpp=.o) $(SRCPRS:.cpp=.o)
+OBJ = $(SRC:.cpp=.o) $(SRCMSG:.cpp=.o) $(SRCCMD:.cpp=.o)
 
 all : $(NAME)
 $(NAME) : $(OBJ)

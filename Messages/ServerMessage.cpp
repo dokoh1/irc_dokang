@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 14:54:39 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 17:51:12 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,9 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			else
 			{
 				user.nick = message.params[0];
-				rpl_connection(client_fd, user, info);
 				user.nickComplete = true;
+				if (user.nickComplete && user.userComplete)
+					rpl_connection(client_fd, user, info);
 			}
 		}
 	}
@@ -67,7 +68,9 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			user.hostname = message.params[1];
 			user.servername = message.params[2];
 			user.realname = message.params[3];
-			rpl_connection(client_fd, user, info);
+			user.userComplete = true;
+			if (user.nickComplete && user.userComplete)
+				rpl_connection(client_fd, user, info);
 		}
 	}
 	else if (isCommand(message, "PRIVMSG"))
@@ -100,7 +103,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else
 	{
-		Response::rpl421(client_fd, message);
+		Response::rpl421(client_fd);
 	}
 }
 

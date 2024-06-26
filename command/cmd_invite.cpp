@@ -6,11 +6,11 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/15 14:35:37 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 12:29:06 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 16:03:33 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Response.hpp"
+#include "../Messages/Response.hpp"
 
 void Response::INVITE(int client_fd, IRCMessage message, serverInfo &info)
 {

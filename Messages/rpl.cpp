@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/24 15:36:03 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 14:53:55 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 17:51:58 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,19 @@ void Response::rpl_passCorrect(int client_fd, serverInfo &info)
 	new_user.client_fd = client_fd;
 	new_user.auth = true;
 	new_user.nickComplete = false;
+	new_user.userComplete = false;
 	info.usersInServer.push_back(new_user);
 }
 
 void Response::rpl461(int client_fd, User &user, IRCMessage message)
 {
-	send_message(client_fd, ":dokang 461 " + user.nick 
+	send_message(client_fd, ":dokang 461 " + user.nick + " "
 				+ message.command + " :Need more parameters\r\n");
 }
 
-void Response::rpl421(int client_fd, IRCMessage message)
+void Response::rpl421(int client_fd)
 {
-	send_message(client_fd, ":dokang 421 :Unknown command \"" + message.command + "\"\r\n");
+	send_message(client_fd, ":dokang 421 \r\n");
 }
 
 void Response::rpl442(int client_fd, User &user, std::string chName)

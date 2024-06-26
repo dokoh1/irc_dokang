@@ -6,11 +6,11 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 18:47:37 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 11:55:43 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 18:20:35 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Response.hpp"
+#include "../Messages/Response.hpp"
 
 void Response::KICK(int client_fd, IRCMessage message, serverInfo &info)
 {
@@ -48,7 +48,8 @@ void Response::KICK(int client_fd, IRCMessage message, serverInfo &info)
 	
 	Response::KickInformToChannelUser(client_fd, message, info);
 	EraseOPInChannel(ch, kickedUser);
-	EraseUserInChannel(ch, kickedUser, info);
+	EraseUserInChannel(ch, kickedUser);
+	EraseChannelInServer(ch, info);
 }
 
 void Response::KickInformToChannelUser(int client_fd, IRCMessage message, serverInfo &info)

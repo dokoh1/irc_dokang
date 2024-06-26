@@ -6,11 +6,11 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 12:18:57 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 11:15:13 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 16:03:42 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Response.hpp"
+#include "../Messages/Response.hpp"
 
 void Response::ToChannelUser(int client_fd, IRCMessage message, serverInfo &info, bool includeMe)
 {
