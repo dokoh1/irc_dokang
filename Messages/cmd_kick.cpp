@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 18:47:37 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/25 12:27:41 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 11:32:24 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,29 +17,31 @@ void Response::KICK(int client_fd, IRCMessage message, serverInfo &info)
 	User &kickingUser = findUser(info, client_fd);
 	Channel &ch = findChannel(info, message.params[0].erase(0, 1));	
 	User &kickedUser = findUser(ch, message.params[1]);
-	std::string reason = "";
 	
-	if (message.numParams == 3)
-		reason += message.params[2];
-	else if (message.numParams < 2)
+	if (message.numParams < 2)
 	{
+		// need more params
 		rpl461(client_fd, kickingUser, message);
 		return ;
 	}
 
 	if (findUser(ch, kickingUser.nick).nick == "")
 	{
+		// You are not on that channel
 		rpl442(client_fd, kickingUser, ch.name);
 		return ;
 	}
+	
 	if (findOPUser(ch, kickingUser.nick).nick == "")
 	{
+		// You must be a channel op
 		rpl482(client_fd, kickingUser, message.params[0]);
 		return ;
 	}
 	
 	if (kickedUser.nick == "")
 	{
+		// They are not on that channel
 		rpl441(client_fd, kickingUser, message);
 		return ;
 	}
@@ -55,8 +57,10 @@ void Response::KickInformToChannelUser(int client_fd, IRCMessage message, server
 	Channel &receivedChannel = findChannel(info, message.params[0]);
 	User &kicked = findUser(info, message.params[1]);
 	std::string reason = "";
-	if (message.params[2].size() > 1)
-		reason = message.params[2].erase(0, 1);
+	int arguIdx = 2;
+	
+	while (message.numParams >= arguIdx + 1)
+		reason += message.params[arguIdx++] + " ";
 	
 	std::list<User>::iterator it;
 

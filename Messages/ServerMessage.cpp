@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/25 16:24:11 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/26 11:16:07 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,6 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	for (std::list<Channel>::iterator it = info.channelInServer.begin(); it != info.channelInServer.end(); ++it)
 		std::cout << (*it).name << "|";
 	std::cout << '\n';
-	// std::cout << "*  * * * USER IN SERVER : ";
-
-	// for (std::list<User>::iterator it = info.usersInServer.begin(); it != info.usersInServer.end(); ++it)
-	// 	std::cout << (*it).nick << " ";
-	// std::cout << '\n';
-
-
 
 	if (isCommand(message, "JOIN"))
 	{
@@ -67,7 +60,6 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	else if (isCommand(message, "USER"))
 	{
 		User &user = findUser(info, client_fd);
-		std::cout << "DeBug Test\n";
 		std::cout << user.nick << " | " << user.auth << "\n";
 
 		if (user.auth == true)
