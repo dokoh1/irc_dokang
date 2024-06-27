@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 16:03:41 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 16:36:13 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 16:43:15 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void Response::TOPIC(int client_fd, IRCMessage message, serverInfo &info)
 {
 	if (message.numParams == 0)
 	{
-		rpl461(client_fd, findUser(info, client_fd), message);
+		rpl461(client_fd, findUser(info, client_fd), message, info);
 		return ;
 	}
 	
@@ -29,8 +29,7 @@ void Response::TOPIC(int client_fd, IRCMessage message, serverInfo &info)
 	std::cout << ch.name << " | " << ch.opt[MODE_t] << " | " << findOPUser(ch, client_fd).nick << "\n";
 	if (ch.opt[MODE_t] == true && findOPUser(ch, client_fd).nick == "")
 	{
-		send_message(client_fd, ":dokang 482 " + user.nick + " #" + ch.name + " :You must be a channel op");
-		send_message(client_fd, "\r\n");
+		send_message(client_fd, ":dokang 482 " + user.nick + " #" + ch.name + " :You must be a channel op\r\n", info);
 		return ;
 	}
 	ch.topic = chTopic;

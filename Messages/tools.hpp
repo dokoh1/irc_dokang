@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:44 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 18:20:28 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 16:45:52 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,11 @@ void setChannelMode(Channel& ch, bool i, bool t, bool k, bool o, bool l);
 std::string getChannelMode(Channel &ch);
 std::string getCreatedTimeUnix();
 std::string getCreatedTimeReadable();
-void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg);
+void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info);
 std::string getMessageParams(IRCMessage message);
 
-void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
-void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
+void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info);
+void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info);
 void EraseUserInChannel(Channel &ch, User &usr);
 void EraseOPInChannel(Channel &ch, User &usr);
 void EraseChannelInServer(Channel &ch, serverInfo &info);

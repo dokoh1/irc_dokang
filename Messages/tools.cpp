@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 18:20:22 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:10:32 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,24 +183,24 @@ std::string getChannelMode(Channel &ch)
 	return (setting);
 }
 
-void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg)
+void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info)
 {
 	if (msg.params[1][0] == '+')
 	{
-		modifyChannelOpt(client_fd, ch, msg);
+		modifyChannelOpt(client_fd, ch, msg, info);
 	}
 	else if (msg.params[1][0] == '-')
 	{
-		unsetChannelOpt(client_fd, ch, msg);
+		unsetChannelOpt(client_fd, ch, msg, info);
 	}
 	else
 	{
 		Response::send_message(client_fd, "dokang 401 " + (findUser(ch, client_fd)).nick
-							+ msg.params[1][0] + " :No such nick");
+							+ msg.params[1][0] + " :No such nick", info);
 	}
 }
 
-void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
+void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info)
 {
 	std::string setting = msg.params[1];
 	int arguIdx = 2;
@@ -224,7 +224,7 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 			else
 			{
 				Response::send_message(client_fd, "dokang 696 " + user.nick + " #" + ch.name 
-									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n", info);
 				continue;
 			}
 		}
@@ -234,13 +234,13 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 			std::cout << "set +o mode :[" << getPrivilegeUser.nick << "]\n";
 			if (getPrivilegeUser.nick == "")
 			{
-				Response::rpl401_modeErr(client_fd, user, msg.params[arguIdx - 1]);
+				Response::rpl401_modeErr(client_fd, user, msg.params[arguIdx - 1], info);
 				continue ;
 			}
 			
 			if (findOPUser(ch, client_fd).nick == "")
 			{
-				Response::rpl482(client_fd, user, ch.name);
+				Response::rpl482(client_fd, user, ch.name, info);
 				continue ;
 			}
 
@@ -258,7 +258,7 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 		}
 		else
 		{
-			Response::rpl472(client_fd, user, setting[i]);
+			Response::rpl472(client_fd, user, setting[i], info);
 			continue;
 		}
 		
@@ -271,14 +271,17 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 		}
 	}
 
-	for (std::list<User>::iterator it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
+	if (validOption != '#' + msg.params[0] + " +")
 	{
-		Response::userPrefix(user, (*it).client_fd);
-		Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n");
+		for (std::list<User>::iterator it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
+		{
+			Response::userPrefix(user, (*it).client_fd, info);
+			Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n", info);
+		}
 	}
 }
 
-void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
+void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info)
 {
 	std::string setting = msg.params[1];
 	int arguIdx = 2;
@@ -294,7 +297,7 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 			ch.opt[MODE_t] = false;
 		else if (setting[i] == 'k')
 		{
-			if (msg.numParams >= 3 && ch.key == msg.params[2])
+			if (msg.numParams >= 3 && ch.key == msg.params[arguIdx++])
 			{
 				ch.opt[MODE_k] = false;
 				ch.key = "";
@@ -302,14 +305,24 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 			else
 			{
 				Response::send_message(client_fd, "dokang 696 " + user.nick + " #" + ch.name 
-									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
+									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n", info);
+				continue;
 			}
 		}
 		else if (setting[i] == 'o')
 		{
-			User &unsetPrivilegeUser = findUser(ch, msg.params[2]);
+			if (msg.numParams < 3)
+				continue;
+				
+			User &unsetPrivilegeUser = findUser(ch, msg.params[arguIdx++]);
+			if (unsetPrivilegeUser.nick == "")
+			{
+				Response::send_message(client_fd, "dokang 401 " + (findUser(ch, client_fd)).nick
+								+ " " + msg.params[arguIdx - 1] + " :No such nick\r\n", info);
+				continue;
+			}
+			
 			ch.opt[MODE_o] = false;
-			findOPUser(ch, unsetPrivilegeUser.nick);
 			for (std::list<User>::iterator it = ch.operator_user.begin(); it != ch.operator_user.end(); ++it)
 			{
 				if ((*it).nick == unsetPrivilegeUser.nick)
@@ -326,7 +339,7 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 		}
 		else
 		{
-			Response::rpl472(client_fd, user, setting[i]);
+			Response::rpl472(client_fd, user, setting[i], info);
 		}
 
 		validOption += setting[i];
@@ -337,10 +350,14 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 				validArgument += " ";
 		}
 	}
-	for (std::list<User>::iterator it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
+
+	if (validOption != '#' + msg.params[0] + " -")
 	{
-		Response::userPrefix(user, (*it).client_fd);
-		Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n");
+		for (std::list<User>::iterator it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
+		{
+			Response::userPrefix(user, (*it).client_fd, info);
+			Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n", info);
+		}
 	}
 }
 
@@ -380,18 +397,6 @@ void EraseUserInChannel(Channel &ch, User &usr)
 			break;
 		}
 	}
-
-	// if (ch.channelUser.size() == 1)
-	// {
-	// 	for (std::list<Channel>::iterator it = ++(info.channelInServer.begin()); it != info.channelInServer.end(); ++it)
-	// 	{
-	// 		if ((*it).name == ch.name)
-	// 		{
-	// 			info.channelInServer.erase(it);
-	// 			break ;
-	// 		}
-	// 	}
-	// }
 }
 
 void EraseChannelInServer(Channel &ch, serverInfo &info)

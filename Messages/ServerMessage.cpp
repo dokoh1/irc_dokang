@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 17:51:12 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 18:16:37 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,10 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	if (isCommand(message, "JOIN"))
 	{
 		if (message.params[0] == ":")
-			Response::requestForRegi(client_fd);
+			Response::requestForRegi(client_fd, info);
 		else
 			Response::joinToChannel(client_fd, message, info);
 	}
-	
 	else if (isCommand(message, "PASS"))
 	{
 		if (message.numParams == 1 && isCorrectPassword(info, message.params[0]))
@@ -37,7 +36,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		}
 		else
 		{
-			rpl464(client_fd);
+			rpl464(client_fd, info);
 		}
 	}
 	else if (isCommand(message, "NICK"))
@@ -47,7 +46,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		{
 			std::cout << user.nick << " | " << user.client_fd << " | " << user.auth << message.params[0] << "\n";
 			if (findUser(info, message.params[0]).nick != "")
-				send_message(client_fd, ":dokang 433 * " + message.params[0] + " :Nickname is already in use.\r\n");
+				send_message(client_fd, ":dokang 433 * " + message.params[0] + " :Nickname is already in use.\r\n", info);
 			else
 			{
 				user.nick = message.params[0];
@@ -61,13 +60,12 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	{
 		User &user = findUser(info, client_fd);
 		std::cout << user.nick << " | " << user.auth << "\n";
-
 		if (user.auth == true)
 		{
 			user.username = message.params[0];
 			user.hostname = message.params[1];
 			user.servername = message.params[2];
-			user.realname = message.params[3];
+			user.realname = aftercolonConcat(message);
 			user.userComplete = true;
 			if (user.nickComplete && user.userComplete)
 				rpl_connection(client_fd, user, info);
@@ -75,35 +73,80 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "PRIVMSG"))
 	{
-		Response::ToChannelUser(client_fd, message, info, false);
+		User &user = findUser(info, client_fd);
+		if (user.nick == "")
+			return ;
+		else if (user.auth && user.nickComplete && user.userComplete)
+		{
+			Response::ToChannelUser(client_fd, message, info, false);			
+		}
 	}
 	else if (isCommand(message, "KICK"))
 	{
-		Response::KICK(client_fd, message, info);
+		User &user = findUser(info, client_fd);
+		if (user.nick == "")
+			return ;
+		else if (user.auth && user.nickComplete && user.userComplete)
+		{
+			Response::KICK(client_fd, message, info);		
+		}
 	}
 	else if (isCommand(message, "INVITE"))
 	{
-		Response::INVITE(client_fd, message, info);
+		User &user = findUser(info, client_fd);
+		if (user.nick == "")
+			return ;
+		else if (user.auth && user.nickComplete && user.userComplete)
+		{
+			Response::INVITE(client_fd, message, info);
+		}
 	}
 	else if (isCommand(message, "TOPIC"))
 	{
-		Response::TOPIC(client_fd, message, info);
+		User &user = findUser(info, client_fd);
+		if (user.nick == "")
+			return ;
+		else if (user.auth && user.nickComplete && user.userComplete)
+		{
+			Response::TOPIC(client_fd, message, info);
+		}
 	}
 	else if (isCommand(message, "MODE"))
 	{
-		Response::MODE(client_fd, message, info);
+		User &user = findUser(info, client_fd);
+		if (user.nick == "")
+			return ;
+		else if (user.auth && user.nickComplete && user.userComplete)
+		{
+			Response::MODE(client_fd, message, info);	
+		}
 	}
 	else if (isCommand(message, "PING"))
 	{
-		send_message(client_fd, "PONG ft_irc local\r\n");
+		User &user = findUser(info, client_fd);
+		if (user.nick == "")
+			return ;
+		else if (user.auth && user.nickComplete && user.userComplete)
+		{
+			send_message(client_fd, "PONG ft_irc local\r\n", info);
+		}
 	}
 	else if (isCommand(message, "QUIT"))
 	{
-		Response::QUIT(client_fd, info);
+		User &user = findUser(info, client_fd);
+		if (user.nick == "")
+			return ;
+		else if (user.auth && user.nickComplete && user.userComplete)
+		{
+			Response::QUIT(client_fd, info);
+		}
 	}
 	else
 	{
-		Response::rpl421(client_fd);
+		User &user = findUser(info, client_fd);
+		if (user.nick == "")
+			return ;
+		Response::rpl421(client_fd, info);
 	}
 }
 

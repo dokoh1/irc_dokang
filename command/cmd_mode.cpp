@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 14:13:57 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 16:03:41 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:11:23 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,13 @@ void Response::MODE(int client_fd, IRCMessage message, serverInfo &info)
 	User &usr = findUser(info, client_fd);
 	if (message.params[0].front() != '#')
 	{
-		// userPrefix(usr, client_fd);
-		// send_message(client_fd, " MODE " + message.params[0] + " :+i\r\n");
 		return ;
 	}
 
 	Channel &ch = findChannel(info, message.params[0].erase(0, 1));
-
-	// User &requestUser = findUser(ch, client_fd);
-	if (message.numParams == 1) // 채널명만 왔을경우 . 채널정보 리턴
+	if (message.numParams == 1)
 	{
-		Response::getChannelInfo(client_fd, usr, ch);
+		Response::getChannelInfo(client_fd, usr, ch, info);
 	}
 	else
 	{
@@ -36,18 +32,16 @@ void Response::MODE(int client_fd, IRCMessage message, serverInfo &info)
 		if (findOPUser(ch, client_fd).nick == "")
 		{
 			send_message(client_fd, ":dokang 482 " + usr.nick + " #" 
-						+ ch.name + " :You must be a channel op");
-			send_message(client_fd, "\r\n");
+						+ ch.name + " :You must be a channel op\r\n", info);
 			return ;
 		}
 
-		changeChannelMode(client_fd, ch, message);
-		// Response::ChannelModeToUser(client_fd, message, ch);
+		changeChannelMode(client_fd, ch, message, info);
 	}
-	send_message(client_fd, "\r\n");
+	send_message(client_fd, "\r\n", info);
 }
 
-void Response::ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch)
+void Response::ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch, serverInfo &info)
 {
 	User &sender = findUser(ch, client_fd);
 	
@@ -62,16 +56,15 @@ void Response::ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch)
 
 	for (it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
 	{
-		userPrefix(sender, (*it).client_fd);
-		send_message((*it).client_fd, " " + message.command + " " + params);
-		send_message((*it).client_fd, "\r\n");
+		userPrefix(sender, (*it).client_fd, info);
+		send_message((*it).client_fd, " " + message.command + " " + params + "\r\n", info);
 	}
 }
 
-void Response::getChannelInfo(int client_fd, User &requestUser, Channel &ch)
+void Response::getChannelInfo(int client_fd, User &requestUser, Channel &ch, serverInfo &info)
 {
 	send_message(client_fd, ":dokang 324 " + requestUser.nick + " #" 
-				+ ch.name + " :" + getChannelMode(ch) + "\n");
+				+ ch.name + " :" + getChannelMode(ch) + "\n", info);
 	send_message(client_fd, ":dokang 329 " + requestUser.nick + " #"
-				+ ch.name + " :" + ch.createdTime + "\r\n");	
+				+ ch.name + " :" + ch.createdTime + "\r\n", info);	
 }

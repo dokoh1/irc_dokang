@@ -145,38 +145,6 @@ void IRCServer::connection_handling()
 	client_buffers[client_fd] = ""; // 버퍼 초기화
 }
 
-// void IRCServer::message_handling(int client_fd)
-// {
-// 	char buffer[BUFFER_SIZE]; // 버퍼를 선언하고 초기화합니다
-// 	std::memset(buffer, 0, BUFFER_SIZE); // 버퍼를 0으로 초기화합니다.
-
-// 	int nread = read(client_fd, buffer, BUFFER_SIZE); // 클라이언트 소켓으로부터 데이터를 읽음
-// 	if (nread == -1)
-// 	{
-// 		std::cerr << "read error" << std::endl;
-// 		client_remove(client_fd);
-// 		return ;
-// 	}
-
-// 	if (nread == 0) // 읽은 데이터가 없으면 클라이언트 제거
-// 	{
-// 		client_remove(client_fd);
-// 		return ;
-// 	}
-// 	client_buffers[client_fd] += std::string(buffer, nread); // 읽은 데이터를 버퍼에 추가
-// 	size_t pos = client_buffers[client_fd].find("\r\n");
-// 	while (pos != std::string::npos)
-// 	{
-// 		std::string message = client_buffers[client_fd].substr(0, pos); //메시지 추출
-// 		client_buffers[client_fd].erase(0, pos + 2); // 추출한 메시지를 버퍼에서 제거
-// 		// std::cout << "Received message: " << message << std::endl; // 메시지를 출력
-// 		this->IRCMessageParse(message);
-// 		Response::checkMessage(client_fd, parsedMessage, serverinfo);
-// 		memset(&parsedMessage, 0, sizeof(parsedMessage)); // 파싱된 메시지를 담는 구조체 초기화
-// 	}
-// }
-
-
 // TODO : 1. 각 클라이언트에 할당된 메세지 버퍼를 보관해야함
 // 		2. 해당 버퍼에 메세지가 남아있으면 이전에 남아있는 메시지와 현재 들어온 메세지를 합쳐야함
 //		3. 메세지를 합쳐서 보관한 것을, \r\n이 들어왔으면 한번에 처리를 해야함

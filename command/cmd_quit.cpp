@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 16:04:35 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 20:50:11 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 16:38:28 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void Response::QUIT(int client_fd, serverInfo &info)
 			{
 				if (client_fd == (*it).client_fd)
 					continue;
-				userPrefix(quitUser, (*it).client_fd);
-				send_message((*it).client_fd, " QUIT :Quit: leaving\r\n");
+				userPrefix(quitUser, (*it).client_fd, info);
+				send_message((*it).client_fd, " QUIT :Quit: leaving\r\n", info);
 			}
 		}
 		else
@@ -62,69 +62,3 @@ void Response::QUIT(int client_fd, serverInfo &info)
 
 	return ;
 }
-
-// /* ************************************************************************** */
-// /*                                                                            */
-// /*                                                        :::      ::::::::   */
-// /*   cmd_quit.cpp                                       :+:      :+:    :+:   */
-// /*                                                    +:+ +:+         +:+     */
-// /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
-// /*                                                +#+#+#+#+#+   +#+           */
-// /*   Created: 2024/06/26 16:04:35 by sihkang           #+#    #+#             */
-// /*   Updated: 2024/06/26 17:09:17 by sihkang          ###   ########seoul.kr  */
-// /*                                                                            */
-// /* ************************************************************************** */
-
-// #include "../Messages/Response.hpp"
-
-// void Response::QUIT(int client_fd, serverInfo &info)
-// {
-// 	User &quitUser = findUser(info, client_fd);
-
-// 	std::list<Channel>::iterator chit;
-// 	std::list<User>::iterator usrit;
-	
-// 	if (info.channelInServer.size() == 1)
-// 	{
-// 		for (usrit = ++(info.usersInServer.begin()); usrit != info.usersInServer.end(); ++usrit)
-// 		{
-// 			if ((*usrit).nick == quitUser.nick)
-// 			{
-// 				info.usersInServer.erase(usrit);
-// 				break;
-// 			}
-// 		}
-// 		return ;
-// 	}
-	
-// 	for (chit = ++(info.channelInServer.begin()); chit != info.channelInServer.end(); ++chit)
-// 	{
-// 		if ((*chit).channelUser.size() == 1)
-// 			continue;
-// 		EraseOPInChannel(*chit, quitUser);
-// 		EraseUserInChannel(*chit, quitUser, info);
-// 		for (std::list<User>::iterator it = ++((*chit).channelUser.begin()) ; it != (*chit).channelUser.end(); ++it)
-// 		{
-// 			if (client_fd == (*it).client_fd)
-// 				continue;
-// 			userPrefix(quitUser, (*it).client_fd);
-// 			send_message((*it).client_fd, " QUIT :Quit: leaving\r\n");
-// 		}
-// 	}
-// 	for (usrit = ++(info.usersInServer.begin()); usrit != info.usersInServer.end(); ++usrit)
-// 	{
-// 		if ((*usrit).nick == quitUser.nick)
-// 		{
-// 			info.usersInServer.erase(usrit);
-// 			break;
-// 		}
-// 	}
-
-// 	std::cout << "*  * * * CHANNEL IN SERVER : ";
-
-// 	for (std::list<Channel>::iterator it = info.channelInServer.begin(); it != info.channelInServer.end(); ++it)
-// 		std::cout << (*it).name << " ";
-// 	std::cout << '\n';
-
-// 	return ;
-// }
