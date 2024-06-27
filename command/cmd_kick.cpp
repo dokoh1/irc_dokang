@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 18:47:37 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 19:11:23 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:18:31 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ void Response::KickInformToChannelUser(int client_fd, IRCMessage message, server
 	
 	std::list<User>::iterator it;
 
-	std::cout << sender.nick << " | " << receivedChannel.name << '\n';
 	for (it = ++(receivedChannel.channelUser.begin()); it != receivedChannel.channelUser.end(); ++it)
 	{
 		userPrefix(sender, (*it).client_fd, info);

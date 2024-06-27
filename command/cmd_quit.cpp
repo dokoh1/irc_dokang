@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 16:04:35 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 16:38:28 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:18:32 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,12 +53,5 @@ void Response::QUIT(int client_fd, serverInfo &info)
 			break;
 		}
 	}
-
-	std::cout << "*  * * * CHANNEL IN SERVER : ";
-
-	for (std::list<Channel>::iterator it = info.channelInServer.begin(); it != info.channelInServer.end(); ++it)
-		std::cout << (*it).name << " ";
-	std::cout << '\n';
-
 	return ;
 }

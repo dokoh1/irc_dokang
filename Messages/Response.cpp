@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 18:15:01 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:31:02 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 void Response::send_message(int client_fd, std::string message, serverInfo &info)
 {
+	std::cout << info.serverName << '\n';
 	try
 	{	
 		if (write(client_fd, message.c_str(), message.size()) == -1)
@@ -22,7 +23,7 @@ void Response::send_message(int client_fd, std::string message, serverInfo &info
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
-		Response::QUIT(client_fd, info);
+		// Response::QUIT(client_fd, info);
 	}
 	return ;
 }
@@ -69,8 +70,6 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 	}
 	
 	Channel &requestedChannel = findChannel(info, chName);
-
-	std::cout << "hahaha" << "\n";	
 	if (requestedChannel.opt[MODE_i] == true && findUser(requestedChannel, requestUser.nick).nick == "")
 	{
 		send_message(client_fd, ":dokang 473 " + requestUser.nick + " #" + chName + " :Cannot join channel (invite only)\r\n", info);

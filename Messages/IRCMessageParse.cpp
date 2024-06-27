@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/10 16:27:19 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/26 16:05:58 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:18:34 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,15 +60,6 @@ void IRCServer::IRCMessageParse(std::string message)
 			parsedMessage.numParams++;
 		}
 	}
-
-	std::cout << parsedMessage.prefix << " | " << parsedMessage.command << " | " ;
-	int i = 0;
-	while (i < parsedMessage.numParams)
-	{
-		std::cout << parsedMessage.params[i++] << " ";
-	}
-	std::cout << std::endl;
-
 }
 
 // 닉네임 중복검사, 유효한 캐릭터로 구성되었는지.

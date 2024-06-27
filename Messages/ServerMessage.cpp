@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 18:16:37 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:18:40 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,6 @@
 
 void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 {
-	
-	std::cout << "* * * * CHANNEL IN SERVER : ";
-
-	for (std::list<Channel>::iterator it = info.channelInServer.begin(); it != info.channelInServer.end(); ++it)
-		std::cout << (*it).name << "|";
-	std::cout << '\n';
-
 	if (isCommand(message, "JOIN"))
 	{
 		if (message.params[0] == ":")
@@ -44,7 +37,6 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		User &user = findUser(info, client_fd);
 		if (user.client_fd > 2 && user.auth == true)
 		{
-			std::cout << user.nick << " | " << user.client_fd << " | " << user.auth << message.params[0] << "\n";
 			if (findUser(info, message.params[0]).nick != "")
 				send_message(client_fd, ":dokang 433 * " + message.params[0] + " :Nickname is already in use.\r\n", info);
 			else
@@ -59,7 +51,6 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	else if (isCommand(message, "USER"))
 	{
 		User &user = findUser(info, client_fd);
-		std::cout << user.nick << " | " << user.auth << "\n";
 		if (user.auth == true)
 		{
 			user.username = message.params[0];

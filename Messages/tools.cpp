@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 19:10:32 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:17:49 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,6 @@ std::string channelUserList(Channel &requestedChannel)
 		if (++it != requestedChannel.channelUser.end())
 			userList += " ";
 	}
-	std::cout << "userList: "<< userList << '\n';
 	return (userList);
 }
 
@@ -231,7 +230,6 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &in
 		else if (setting[i] == 'o')
 		{
 			User &getPrivilegeUser = findUser(ch, msg.params[arguIdx++]);
-			std::cout << "set +o mode :[" << getPrivilegeUser.nick << "]\n";
 			if (getPrivilegeUser.nick == "")
 			{
 				Response::rpl401_modeErr(client_fd, user, msg.params[arguIdx - 1], info);

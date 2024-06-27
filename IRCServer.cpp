@@ -93,17 +93,14 @@ void IRCServer::non_blocking(int cfd)
 
 void IRCServer::run()
 {
-	// std::cout << "start run\n";
 	while (true) // 서버가 종료될 때까지 실행
 	{
-		// std::cout << "poll waiting...";
 		int count_poll = poll(&poll_fd[0], poll_fd.size(), -1); //폴링, 이벤트가 발생할 떄까지 대기
 		if (count_poll == -1)
 		{
 			std::cerr << "poll error" << std::endl;
 			exit(1);
 		}
-		// std::cout << "running...\n";
 		for (size_t i = 0; i < poll_fd.size(); i++) // 모든 파일 디스크립터를 순회
 		{
 			if (poll_fd[i].revents & POLLIN) // 읽기 가능한 이벤트가 발생했는지 확인
@@ -118,7 +115,6 @@ void IRCServer::run()
 
 			} 
 		}
-		// std::cout << "complete\n";
 	}
 }
 
@@ -156,11 +152,13 @@ void IRCServer::message_handling(int client_fd)
     if (nread == -1)
     {
         std::cerr << "read error" << std::endl;
+		Response::QUIT(client_fd, this->serverinfo); // added by sihwan
         client_remove(client_fd);
         return ;
     }
     if (nread == 0) // 읽은 데이터가 없으면 클라이언트 제거
     {
+		Response::QUIT(client_fd, this->serverinfo); // added by sihwan
         client_remove(client_fd);
         return ;
     }
@@ -169,13 +167,6 @@ void IRCServer::message_handling(int client_fd)
 	size_t pos_temp = temp_message[client_fd].length();
     while (1)
     {
-		// nc -> ctrl + v + m -> \r\n
-		// std::cout << "\n";
-		for (size_t i = 0; i < client_buffers[client_fd].length(); ++i)
-		{
-			std::cout << (int)client_buffers[client_fd][i] << " ";
-		}
-		std::cout << "\n";
         pos = client_buffers[client_fd].find("\r\n"); // 버퍼에서 줄바꿈 문자를 찾음
         if (pos == std::string::npos) {
 			// 기존에 들어온 메세지를 보관해서, 나중에 들어오는 메세지랑 합쳐서 처리하는 부분이 있어야함

@@ -97,8 +97,6 @@ class IRCServer : public std::exception
 		int listen_fd; // listen 소켓 파일 디스크립터
 		std::string server_pwd; // 서버 연결 비밀번호
 		std::vector<struct pollfd> poll_fd; // 폴링할 파일 디스크립터 목록 
-		// std::vector<User *> usersInServer; // 서버에 등록된 유저
-		// std::vector<Channel *> channelInServer; // 서버에 존재하는 채널
 
 		//struct pollfd는 구조체는 readme에 설명이 있음
 		std::map<int, std::string> client_buffers;

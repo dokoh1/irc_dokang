@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/13 16:03:41 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 16:43:15 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/27 19:18:33 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ void Response::TOPIC(int client_fd, IRCMessage message, serverInfo &info)
 	
 	std::string chTopic = aftercolonConcat(message);
 
-	std::cout << ch.name << " | " << ch.opt[MODE_t] << " | " << findOPUser(ch, client_fd).nick << "\n";
 	if (ch.opt[MODE_t] == true && findOPUser(ch, client_fd).nick == "")
 	{
 		send_message(client_fd, ":dokang 482 " + user.nick + " #" + ch.name + " :You must be a channel op\r\n", info);
