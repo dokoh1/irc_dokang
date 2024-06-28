@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 19:17:49 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/28 16:02:22 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,16 @@ bool isCommand(IRCMessage msg, std::string cmd)
 	if (msg.command.find(cmd) != std::string::npos && msg.command.size() == cmd.size())
 		return (true);
 	return (false);
+}
+
+bool isValidNick(std::string nick)
+{
+	for (size_t i = 0; i < nick.size(); i++)
+	{
+		if (nick[i] != '_' && !isalnum(nick[i]))
+			return (false);
+	}
+	return (true);
 }
 
 std::string getMessageParams(IRCMessage message)
@@ -182,24 +192,24 @@ std::string getChannelMode(Channel &ch)
 	return (setting);
 }
 
-void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info)
+void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg)
 {
 	if (msg.params[1][0] == '+')
 	{
-		modifyChannelOpt(client_fd, ch, msg, info);
+		modifyChannelOpt(client_fd, ch, msg);
 	}
 	else if (msg.params[1][0] == '-')
 	{
-		unsetChannelOpt(client_fd, ch, msg, info);
+		unsetChannelOpt(client_fd, ch, msg);
 	}
 	else
 	{
 		Response::send_message(client_fd, "dokang 401 " + (findUser(ch, client_fd)).nick
-							+ msg.params[1][0] + " :No such nick", info);
+							+ msg.params[1][0] + " :No such nick");
 	}
 }
 
-void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info)
+void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];
 	int arguIdx = 2;
@@ -223,7 +233,7 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &in
 			else
 			{
 				Response::send_message(client_fd, "dokang 696 " + user.nick + " #" + ch.name 
-									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n", info);
+									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
 				continue;
 			}
 		}
@@ -232,13 +242,13 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &in
 			User &getPrivilegeUser = findUser(ch, msg.params[arguIdx++]);
 			if (getPrivilegeUser.nick == "")
 			{
-				Response::rpl401_modeErr(client_fd, user, msg.params[arguIdx - 1], info);
+				Response::rpl401_modeErr(client_fd, user, msg.params[arguIdx - 1]);
 				continue ;
 			}
 			
 			if (findOPUser(ch, client_fd).nick == "")
 			{
-				Response::rpl482(client_fd, user, ch.name, info);
+				Response::rpl482(client_fd, user, ch.name);
 				continue ;
 			}
 
@@ -256,7 +266,7 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &in
 		}
 		else
 		{
-			Response::rpl472(client_fd, user, setting[i], info);
+			Response::rpl472(client_fd, user, setting[i]);
 			continue;
 		}
 		
@@ -273,13 +283,13 @@ void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &in
 	{
 		for (std::list<User>::iterator it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
 		{
-			Response::userPrefix(user, (*it).client_fd, info);
-			Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n", info);
+			Response::userPrefix(user, (*it).client_fd);
+			Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n");
 		}
 	}
 }
 
-void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info)
+void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg)
 {
 	std::string setting = msg.params[1];
 	int arguIdx = 2;
@@ -303,7 +313,7 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &inf
 			else
 			{
 				Response::send_message(client_fd, "dokang 696 " + user.nick + " #" + ch.name 
-									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n", info);
+									+ " k * :You must specify a parameter for the key mode. Syntax: <key>.\r\n");
 				continue;
 			}
 		}
@@ -316,7 +326,7 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &inf
 			if (unsetPrivilegeUser.nick == "")
 			{
 				Response::send_message(client_fd, "dokang 401 " + (findUser(ch, client_fd)).nick
-								+ " " + msg.params[arguIdx - 1] + " :No such nick\r\n", info);
+								+ " " + msg.params[arguIdx - 1] + " :No such nick\r\n");
 				continue;
 			}
 			
@@ -337,7 +347,7 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &inf
 		}
 		else
 		{
-			Response::rpl472(client_fd, user, setting[i], info);
+			Response::rpl472(client_fd, user, setting[i]);
 		}
 
 		validOption += setting[i];
@@ -353,8 +363,8 @@ void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &inf
 	{
 		for (std::list<User>::iterator it = ++(ch.channelUser.begin()); it != ch.channelUser.end(); ++it)
 		{
-			Response::userPrefix(user, (*it).client_fd, info);
-			Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n", info);
+			Response::userPrefix(user, (*it).client_fd);
+			Response::send_message((*it).client_fd, " " + msg.command + " " + validOption + " " + validArgument + "\r\n");
 		}
 	}
 }

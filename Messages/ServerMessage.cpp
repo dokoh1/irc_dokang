@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 19:18:40 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/28 15:56:48 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	if (isCommand(message, "JOIN"))
 	{
 		if (message.params[0] == ":")
-			Response::requestForRegi(client_fd, info);
+			Response::requestForRegi(client_fd);
 		else
 			Response::joinToChannel(client_fd, message, info);
 	}
@@ -29,7 +29,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		}
 		else
 		{
-			rpl464(client_fd, info);
+			rpl464(client_fd);
 		}
 	}
 	else if (isCommand(message, "NICK"))
@@ -38,7 +38,11 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		if (user.client_fd > 2 && user.auth == true)
 		{
 			if (findUser(info, message.params[0]).nick != "")
-				send_message(client_fd, ":dokang 433 * " + message.params[0] + " :Nickname is already in use.\r\n", info);
+				send_message(client_fd, ":dokang 433 * " + message.params[0] + " :Nickname is already in use.\r\n");
+			else if (!isValidNick(message.params[0]))
+			{
+				rpl432(client_fd, message.params[0]);
+			}
 			else
 			{
 				user.nick = message.params[0];
@@ -119,7 +123,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 			return ;
 		else if (user.auth && user.nickComplete && user.userComplete)
 		{
-			send_message(client_fd, "PONG ft_irc local\r\n", info);
+			send_message(client_fd, "PONG ft_irc local\r\n");
 		}
 	}
 	else if (isCommand(message, "QUIT"))
@@ -137,7 +141,7 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 		User &user = findUser(info, client_fd);
 		if (user.nick == "")
 			return ;
-		Response::rpl421(client_fd, info);
+		Response::rpl421(client_fd);
 	}
 }
 

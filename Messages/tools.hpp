@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:44 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 16:45:52 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/28 15:51:30 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ struct User;
 struct Channel;
 
 bool isCommand(IRCMessage msg, std::string cmd);
+bool isValidNick(std::string nick);
 bool isCorrectPassword(serverInfo &info, std::string &client_pw);
 User& findUser(serverInfo &info, std::string nick);
 User& findUser(serverInfo &info, int client_fd);
@@ -37,11 +38,11 @@ void setChannelMode(Channel& ch, bool i, bool t, bool k, bool o, bool l);
 std::string getChannelMode(Channel &ch);
 std::string getCreatedTimeUnix();
 std::string getCreatedTimeReadable();
-void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info);
+void changeChannelMode(int client_fd, Channel &ch, IRCMessage msg);
 std::string getMessageParams(IRCMessage message);
 
-void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info);
-void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg, serverInfo &info);
+void modifyChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
+void unsetChannelOpt(int client_fd, Channel &ch, IRCMessage msg);
 void EraseUserInChannel(Channel &ch, User &usr);
 void EraseOPInChannel(Channel &ch, User &usr);
 void EraseChannelInServer(Channel &ch, serverInfo &info);

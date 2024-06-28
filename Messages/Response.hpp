@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 16:42:16 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/28 15:53:53 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,19 +36,19 @@ public:
 	static void INVITE(int client_fd, IRCMessage message, serverInfo &info);
 	static void	KICK(int client_fd, IRCMessage message, serverInfo &info);
 	static void QUIT(int client_fd, serverInfo &info);
+	static void DCC(IRCMessage message, User &sender, serverInfo &info);
 	static void ToChannelUser(int client_fd, IRCMessage message, serverInfo &info, bool includeMe);
 	static void addNewChannel(User &requestUser, std::string chName, serverInfo &info);
-	static void ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch, serverInfo &info);
-	static void getChannelInfo(int client_fd, User &requestUser, Channel &ch, serverInfo &info);
+	static void ChannelModeToUser(int client_fd, IRCMessage message, Channel &ch);
+	static void getChannelInfo(int client_fd, User &requestUser, Channel &ch);
 	static void KickInformToChannelUser(int client_fd, IRCMessage message, serverInfo &info);
 
-	static void getChannelBanlist(int client_fd, User &requestUser, Channel& ch);
 	// in ServerMessage.cpp
-	static void send_message(int client_fd, std::string message, serverInfo &info);
-	static void requestForRegi(int client_fd, serverInfo &info);
+	static void send_message(int client_fd, std::string message);
+	static void requestForRegi(int client_fd);
 	static void checkMessage(int client_fd, IRCMessage message, serverInfo &info);
 	static void joinToChannel(int client_fd, IRCMessage message, serverInfo &info);
-	static void userPrefix(User &user, int receiveSocket, serverInfo &info);
+	static void userPrefix(User &user, int receiveSocket);
 
 
 	// exception
@@ -64,15 +64,16 @@ public:
 	
 	static void rpl_connection(int client_fd, User &user, serverInfo &info);
 	static void rpl_passCorrect(int client_fd, serverInfo &info);	
-	static void rpl421(int client_fd, serverInfo &info);
-	static void rpl441(int client_fd, User &user, IRCMessage message, serverInfo &info);
-	static void rpl442(int client_fd, User &user, std::string chName, serverInfo &info);
-	static void rpl461(int client_fd, User &user, IRCMessage message, serverInfo &info);
-	static void rpl482(int client_fd, User &user, std::string chName, serverInfo &info);
-	static void rpl472(int client_fd, User &user, char wrongMode, serverInfo &info);
-	static void rpl464(int client_fd, serverInfo &info);	
+	static void rpl421(int client_fd);
+	static void rpl432(int client_fd, std::string nick);
+	static void rpl441(int client_fd, User &user, IRCMessage message);
+	static void rpl442(int client_fd, User &user, std::string chName);
+	static void rpl461(int client_fd, User &user, IRCMessage message);
+	static void rpl482(int client_fd, User &user, std::string chName);
+	static void rpl472(int client_fd, User &user, char wrongMode);
+	static void rpl464(int client_fd);	
 
-	static void rpl401_modeErr(int client_fd, User &OPuser, std::string targetUser, serverInfo &info);
+	static void rpl401_modeErr(int client_fd, User &OPuser, std::string targetUser);
 };
 
 #endif

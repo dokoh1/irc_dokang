@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/26 16:04:35 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 19:18:32 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/28 13:11:52 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void Response::QUIT(int client_fd, serverInfo &info)
 			{
 				if (client_fd == (*it).client_fd)
 					continue;
-				userPrefix(quitUser, (*it).client_fd, info);
-				send_message((*it).client_fd, " QUIT :Quit: leaving\r\n", info);
+				userPrefix(quitUser, (*it).client_fd);
+				send_message((*it).client_fd, " QUIT :Quit: leaving\r\n");
 			}
 		}
 		else

@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 18:47:37 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/27 19:18:31 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/28 13:12:45 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,25 +20,25 @@ void Response::KICK(int client_fd, IRCMessage message, serverInfo &info)
 	
 	if (message.numParams < 2)
 	{
-		rpl461(client_fd, kickingUser, message, info);
+		rpl461(client_fd, kickingUser, message);
 		return ;
 	}
 
 	if (findUser(ch, kickingUser.nick).nick == "")
 	{
-		rpl442(client_fd, kickingUser, ch.name, info);
+		rpl442(client_fd, kickingUser, ch.name);
 		return ;
 	}
 	
 	if (findOPUser(ch, kickingUser.nick).nick == "")
 	{
-		rpl482(client_fd, kickingUser, message.params[0], info);
+		rpl482(client_fd, kickingUser, message.params[0]);
 		return ;
 	}
 	
 	if (kickedUser.nick == "")
 	{
-		rpl441(client_fd, kickingUser, message, info);
+		rpl441(client_fd, kickingUser, message);
 		return ;
 	}
 	
@@ -63,8 +63,8 @@ void Response::KickInformToChannelUser(int client_fd, IRCMessage message, server
 
 	for (it = ++(receivedChannel.channelUser.begin()); it != receivedChannel.channelUser.end(); ++it)
 	{
-		userPrefix(sender, (*it).client_fd, info);
+		userPrefix(sender, (*it).client_fd);
 		send_message((*it).client_fd, " " + message.command + " #" + receivedChannel.name + " "
-					+ kicked.nick + " :" + reason + "\r\n", info);
+					+ kicked.nick + " :" + reason + "\r\n");
 	}
 }
