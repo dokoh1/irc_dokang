@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tools.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
+/*   By: sihwan <sihwan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:44 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/28 15:51:30 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/30 12:02:44 by sihwan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ struct Channel;
 bool isCommand(IRCMessage msg, std::string cmd);
 bool isValidNick(std::string nick);
 bool isCorrectPassword(serverInfo &info, std::string &client_pw);
+bool numParamCheck(int client_fd, IRCMessage message, int num);
 User& findUser(serverInfo &info, std::string nick);
 User& findUser(serverInfo &info, int client_fd);
 User& findUser(Channel &ch, int client_fd);

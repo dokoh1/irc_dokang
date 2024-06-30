@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerMessage.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
+/*   By: sihwan <sihwan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/08 14:11:25 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/28 15:56:48 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/30 12:14:21 by sihwan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 {
 	if (isCommand(message, "JOIN"))
 	{
+		if (!numParamCheck(client_fd, message, 1))
+			return ;
 		if (message.params[0] == ":")
 			Response::requestForRegi(client_fd);
 		else
@@ -34,6 +36,8 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "NICK"))
 	{
+		if (!numParamCheck(client_fd, message, 1))
+			return ;
 		User &user = findUser(info, client_fd);
 		if (user.client_fd > 2 && user.auth == true)
 		{
@@ -54,6 +58,8 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "USER"))
 	{
+		if (!numParamCheck(client_fd, message, 4))
+			return ;
 		User &user = findUser(info, client_fd);
 		if (user.auth == true)
 		{
@@ -68,6 +74,8 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "PRIVMSG"))
 	{
+		if (!numParamCheck(client_fd, message, 2))
+			return ;
 		User &user = findUser(info, client_fd);
 		if (user.nick == "")
 			return ;
@@ -78,6 +86,8 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "KICK"))
 	{
+		if (!numParamCheck(client_fd, message, 1))
+			return ;
 		User &user = findUser(info, client_fd);
 		if (user.nick == "")
 			return ;
@@ -88,6 +98,8 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "INVITE"))
 	{
+		if (!numParamCheck(client_fd, message, 1))
+			return ;
 		User &user = findUser(info, client_fd);
 		if (user.nick == "")
 			return ;
@@ -108,6 +120,8 @@ void Response::checkMessage(int client_fd, IRCMessage message, serverInfo &info)
 	}
 	else if (isCommand(message, "MODE"))
 	{
+		if (!numParamCheck(client_fd, message, 1))
+			return ;
 		User &user = findUser(info, client_fd);
 		if (user.nick == "")
 			return ;

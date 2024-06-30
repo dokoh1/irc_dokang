@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tools.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
+/*   By: sihwan <sihwan@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 14:16:22 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/28 16:02:22 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/06/30 12:04:02 by sihwan           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,16 @@ bool isValidNick(std::string nick)
 	{
 		if (nick[i] != '_' && !isalnum(nick[i]))
 			return (false);
+	}
+	return (true);
+}
+
+bool numParamCheck(int client_fd, IRCMessage message, int num)
+{
+	if (message.numParams < num)
+	{
+		Response::send_message(client_fd, ":dokang 461 " + message.command + " :Need more parameters\r\n");
+		return (false);
 	}
 	return (true);
 }
