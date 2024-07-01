@@ -1,23 +1,25 @@
 NAME = Ircserv
-CPPFLAGS = -Werror -Wall -Wextra -std=c++98 -g -fsanitize=address
-SRC = main.cpp FDMatcher.cpp IRCServer.cpp 
-SRCMSG = Messages/IRCMessageParse.cpp Messages/ServerMessage.cpp Messages/tools.cpp Messages/Response.cpp Messages/rpl.cpp
-SRCCMD = command/cmd_topic.cpp command/cmd_privmsg.cpp command/cmd_mode.cpp command/cmd_invite.cpp command/cmd_kick.cpp command/cmd_quit.cpp
+CPPFLAGS = -Werror -Wall -Wextra -std=c++98 -MMD -MP
 
-OBJ = $(SRC:.cpp=.o) $(SRCMSG:.cpp=.o) $(SRCCMD:.cpp=.o)
+SRCNAME = main FDMatcher IRCServer Messages/IRCMessageParse Messages/ServerMessage Messages/tools Messages/Response Messages/rpl command/cmd_topic command/cmd_privmsg command/cmd_mode command/cmd_invite command/cmd_kick command/cmd_quit
+SRC     = $(addsuffix .cpp, $(SRCNAME))
+OBJ     = $(addsuffix .o, $(SRCNAME))
+DEP     = $(addsuffix .d, $(SRCNAME))
 
 all : $(NAME)
 $(NAME) : $(OBJ)
 	$(CXX) $(CPPFLAGS) $(OBJ) -o $@
 
+-include $(DEP)
+
 %.o : %.c
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 clean :
-	rm -rf $(OBJ)
+	rm -rf $(OBJ) $(DEP)
 
 fclean :
-	rm -rf $(OBJ)
+	rm -rf $(OBJ) $(DEP)
 	rm -rf $(NAME)
 
 re : fclean all
