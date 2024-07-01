@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/24 15:36:03 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/28 15:56:46 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/07/01 14:46:46 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void Response::rpl_connection(int client_fd, User &user, serverInfo &info)
 		send_message(client_fd, ":dokang 002 " + user.nick + " :Your host is ft_irc by dokang\r\n");
 		send_message(client_fd, ":dokang 003 " + user.nick + " :This server was created " + info.serverCreatedTime + "\r\n");
 		send_message(client_fd, ":dokang 004 " + user.nick + " dokang dokangv1 io itkol :bklov\r\n");
-		send_message(client_fd, ":dokang 005 " + user.nick + " CASEMAPPING=rfc1459 KICKLEN=255 :are supported by this server\r\n");
+		send_message(client_fd, ":dokang 005 " + user.nick + " CASEMAPPING=rfc1459 :are supported by this server\r\n");
 	}
 }
 

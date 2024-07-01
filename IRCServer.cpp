@@ -179,7 +179,6 @@ void IRCServer::message_handling(int client_fd)
 		client_buffers[client_fd].erase(0, pos + 2);
         std::string message = temp_message[client_fd].substr(0, pos_temp); //메시지 추출
         temp_message[client_fd].clear(); // 추출한 메시지를 버퍼에서 제거
-		std::cout << message << std::endl;
         this->IRCMessageParse(message);
         Response::checkMessage(client_fd, parsedMessage, serverinfo);
         memset(&parsedMessage, 0, sizeof(parsedMessage)); // 파싱된 메시지를 담는 구조체 초기화
