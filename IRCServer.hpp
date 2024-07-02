@@ -27,8 +27,8 @@
 # define MODE_o 3
 # define MODE_l 4
 
-# define MAXNUM_USER 1
-# define MAXNUM_CH   2
+# define MAXNUM_USER 100
+# define MAXNUM_CH   30
 
 struct User;
 
