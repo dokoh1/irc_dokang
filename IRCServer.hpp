@@ -27,6 +27,9 @@
 # define MODE_o 3
 # define MODE_l 4
 
+# define MAXNUM_USER 1
+# define MAXNUM_CH   2
+
 struct User;
 
 struct Channel

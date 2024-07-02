@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:46:56 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/28 15:53:53 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/07/02 12:00:12 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,11 @@ public:
 	static void rpl441(int client_fd, User &user, IRCMessage message);
 	static void rpl442(int client_fd, User &user, std::string chName);
 	static void rpl461(int client_fd, User &user, IRCMessage message);
+	static void rpl465(int client_fd);
 	static void rpl482(int client_fd, User &user, std::string chName);
 	static void rpl472(int client_fd, User &user, char wrongMode);
 	static void rpl464(int client_fd);	
+	static void rpl470(int client_fd, serverInfo &info, std::string chName);
 
 	static void rpl401_modeErr(int client_fd, User &OPuser, std::string targetUser);
 };

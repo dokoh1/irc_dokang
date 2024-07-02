@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/24 15:36:03 by sihkang           #+#    #+#             */
-/*   Updated: 2024/07/01 14:46:46 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/07/02 12:02:49 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,11 @@ void Response::rpl_connection(int client_fd, User &user, serverInfo &info)
 
 void Response::rpl_passCorrect(int client_fd, serverInfo &info)
 {
+	if (info.usersInServer.size() > MAXNUM_USER)
+	{
+		rpl465(client_fd);
+		return ;
+	}
 	send_message(client_fd, "Password Correct! Register user infomation \"NICK <nickname>\" \"USER <username> <hostname> <servername> :<realname>\" \r\n");
 	User new_user;
 	new_user.client_fd = client_fd;
@@ -33,6 +38,18 @@ void Response::rpl_passCorrect(int client_fd, serverInfo &info)
 	new_user.nickComplete = false;
 	new_user.userComplete = false;
 	info.usersInServer.push_back(new_user);
+}
+
+void Response::rpl465(int client_fd)
+{
+	send_message(client_fd, ":dokang 465 :Server is full, no new connections allowed\r\n");
+
+}
+
+void Response::rpl470(int client_fd, serverInfo &info, std::string chName)
+{
+	send_message(client_fd, ":dokang 470 " + findUser(info, client_fd).nick + " #" + chName 
+				+ " :Unable to create channel, the channel limit has been reached\r\n");
 }
 
 void Response::rpl461(int client_fd, User &user, IRCMessage message)

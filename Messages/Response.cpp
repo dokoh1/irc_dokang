@@ -6,7 +6,7 @@
 /*   By: sihkang <sihkang@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 13:48:17 by sihkang           #+#    #+#             */
-/*   Updated: 2024/06/28 13:11:50 by sihkang          ###   ########seoul.kr  */
+/*   Updated: 2024/07/02 12:02:35 by sihkang          ###   ########seoul.kr  */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,13 @@ void Response::joinToChannel(int client_fd, IRCMessage message, serverInfo &info
 	}
 
 	std::string chName = message.params[0].erase(0, 1);
-		if (findChannel(info, chName).name == "")
+	if (findChannel(info, chName).name == "")
 	{
+		if (info.channelInServer.size() > MAXNUM_CH)
+		{
+			rpl470(client_fd, info, chName);
+			return ;
+		}
 		addNewChannel(requestUser, chName, info);
 	}
 	
